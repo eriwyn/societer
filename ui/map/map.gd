@@ -2,46 +2,7 @@ extends Node2D
 
 var terrain
 
-func create_map():
-	var river = {"size": 3, "color": "blue"}
-	print(terrain)
-	print("a")
-	terrain.get_edge(16).set_data("river", river)
-	
-	var triangle_idx = 5
-	var triangle = terrain.get_triangle(triangle_idx)
-	
-	print("Triangle index : %d" % (triangle.get_index()))
-	
-	var edges = triangle.edges()
-	
-	print("Number of edges : %d" % (edges.size()))
-	print()
-	
-	for edge in edges:
-		print("Edge index : %d" % (edge.get_index()))
-		var start_point = edge.start()
-		var end_point = edge.end()
-		var start = start_point.point2d()
-		var end = end_point.point2d()
-		
-		print("Start point index : %d" % (start_point.get_index()))
-		print("End point index : %d" % (end_point.get_index()))
-
-		print("Start point : %s" % (start))
-		print("End point : %s" % (end))
-		
-		if edge.has_key("river"):
-			print("Has river")
-			var a_river = edge.get_data("river")
-			print("River size : %d" % (a_river["size"]))
-			print("River color : %s" % (a_river["color"]))
-		
-		print()
-		print(terrain.get_point(5).point3d())
-	
-
-func draw_triangles():
+func heightmap():
 	for triangle in terrain.get_triangles():
 		var colors = Gradient.new()
 		colors.add_point(0.999,  Color("#9e0142")) # red
@@ -127,7 +88,7 @@ func draw_voronoi_cells_convex_hull():
 	
 func _draw():
 	print("before drawing")
-	draw_triangles()
+	heightmap()
 #	draw_voronoi_cells()
 #	draw_triangles_edges()
 	# draw_voronoi_cells_convex_hull()
