@@ -1,0 +1,49 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=4
+
+_global_script_classes=[ {
+"base": "Reference",
+"class": "Delaunator",
+"language": "GDScript",
+"path": "res://addons/delaunator/Delaunator.gd"
+}, {
+"base": "Reference",
+"class": "PoissonDiscSampling",
+"language": "GDScript",
+"path": "res://addons/PoissonDiscSampling/PoissonDiscSampling.gd"
+}, {
+"base": "Reference",
+"class": "Terrain",
+"language": "GDScript",
+"path": "res://utils/terrain/Terrain.gd"
+} ]
+_global_script_class_icons={
+"Delaunator": "",
+"PoissonDiscSampling": "",
+"Terrain": ""
+}
+
+[application]
+
+config/name="Societer"
+run/main_scene="res://world/game.tscn"
+config/icon="res://icon.png"
+
+[gui]
+
+common/drop_mouse_on_gui_input_disabled=true
+
+[physics]
+
+common/enable_pause_aware_picking=true
+
+[rendering]
+
+environment/default_environment="res://default_env.tres"

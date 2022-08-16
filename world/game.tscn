@@ -1,0 +1,13 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://ui/ui.tscn" type="PackedScene" id=1]
+[ext_resource path="res://world/game.gd" type="Script" id=2]
+
+[node name="Game" type="Spatial"]
+script = ExtResource( 2 )
+
+[node name="UI" parent="." instance=ExtResource( 1 )]
+
+[connection signal="world_loaded" from="." to="UI/Map" method="_on_Game_world_loaded"]
+
+[editable path="UI"]
