@@ -17,21 +17,22 @@ class Triangles:
 	func _should_continue():
 		return (_curr < _end)
 		
-	func _iter_init(arg):
+	func _iter_init(_arg):
 		_curr = 0
 		return _should_continue()
 		
-	func _iter_next(arg):
+	func _iter_next(_arg):
 		_curr += 1
 		return _should_continue()
 		
-	func _iter_get(arg):
+	func _iter_get(_arg):
 		var triangle = Triangle.new(_curr,_terrain)
 		return triangle
 		
 	func size():
 		return _end
 
+# Triangle object
 class Triangle:
 	var _idx
 	var _terrain
@@ -85,7 +86,8 @@ class Triangle:
 		for point in points():
 			polygon.append(point.point2d())
 		return polygon
-		
+
+# Points iterator		
 class Points:
 	var _terrain
 	var _curr
@@ -99,21 +101,22 @@ class Points:
 	func _should_continue():
 		return (_curr < _end)
 		
-	func _iter_init(arg):
+	func _iter_init(_arg):
 		_curr = 0
 		return _should_continue()
 		
-	func _iter_next(arg):
+	func _iter_next(_arg):
 		_curr += 1
 		return _should_continue()
 		
-	func _iter_get(arg):
+	func _iter_get(_arg):
 		var point = Point.new(_curr,_terrain)
 		return point
 		
 	func size():
 		return _end
-	
+
+# Point object	
 class Point:
 	var _idx
 	var _terrain
@@ -176,6 +179,7 @@ class Point:
 				break
 		return list_points
 
+# Edges iterator
 class Edges:
 	var _terrain
 	var _curr
@@ -189,21 +193,22 @@ class Edges:
 	func _should_continue():
 		return (_curr < _end)
 		
-	func _iter_init(arg):
+	func _iter_init(_arg):
 		_curr = 0
 		return _should_continue()
 		
-	func _iter_next(arg):
+	func _iter_next(_arg):
 		_curr += 1
 		return _should_continue()
 		
-	func _iter_get(arg):
+	func _iter_get(_arg):
 		var edge = Edge.new(_curr,_terrain)
 		return edge
 		
 	func size():
 		return _end
 		
+# Edge object
 class Edge:
 	var _idx
 	var _terrain
@@ -243,12 +248,14 @@ class Edge:
 	
 	func opposite():
 		return Edge.new(_terrain._halfedges[_idx], _terrain)
-		
-const terrain_file = "user://terrain.save"
 
-var width: int
-var height: int
-var spacing: int
+# Terrain instance variables
+const terrain_file = "user://terrain_%s.save"
+
+var _width: int
+var _height: int
+var _spacing: int
+var _name: String
 var _points = PoolVector3Array()
 var _halfedges
 var _triangles
@@ -258,33 +265,18 @@ var _points_data = []
 var _edges_data = []
 var _triangles_data = []
 var _file = File.new()
-var _debug = true
 
-"""
-func general_type_of(obj):
-	var typ = typeof(obj)
-	var builtin_type_names = ["nil", "bool", "int", "real", "string", "vector2", "rect2", "vector3", "maxtrix32", "plane", "quat", "aabb",  "matrix3", "transform", "color", "image", "nodepath", "rid", null, "inputevent", "dictionary", "array", "rawarray", "intarray", "realarray", "stringarray", "vector2array", "vector3array", "colorarray", "unknown"]
-
-	if(typ == TYPE_OBJECT):
-		return obj.type_of()
-	else:
-		return builtin_type_names[typ]
-"""
-
-func _print_debug(message):
-	if _debug:
-		print(message)
-
-func _init(width:int=1600, height:int=800, spacing:int=30, create=false):
+# Terrain constructor
+func _init(width:int=1600, height:int=800, spacing:int=30, create=false, name:String="delaunay"):
 	if _file.file_exists(terrain_file) and not create:
-		_print_debug("loading...")
-		_load()
+		Global.print_debug("loading : %s ..." % (name))
+		_load(name)
 	else:
-		_print_debug("Creating...")
+		Global.print_debug("Creating : %s ..." % (name))
 		var delaunay: Delaunator
-		self.width = width
-		self.height = height
-		self.spacing = spacing
+		_width = width
+		_height = height
+		_spacing = spacing
 		_create_points()
 		delaunay = Delaunator.new(_points)
 	
@@ -292,35 +284,36 @@ func _init(width:int=1600, height:int=800, spacing:int=30, create=false):
 		_triangles = PoolIntArray(delaunay.triangles)
 	
 		# Initialize _points_to_halfedges
-		for edge_idx in edges():
-			var edge = get_edge(edge_idx)
+		for edge in get_edges():
 			var endpoint = _triangles[edge.next_half().get_index()]
-			if (! _points_to_halfedges.has(endpoint) or _halfedges[edge_idx] == -1):
-				_points_to_halfedges[endpoint] = edge_idx
+			if (! _points_to_halfedges.has(endpoint) or _halfedges[edge.get_index()] == -1):
+				_points_to_halfedges[endpoint] = edge.get_index()
 			
 		# Initialise _points_data
-		for point_idx in points():
+		for point_idx in self.get_points().size():
 			_points_data.append({})
 	
 		# Initialise _edges_data
-		for edge_idx in edges():
+		for edge_idx in self.get_edges().size():
 			_edges_data.append({})
 	
 		# Initialise _triangle_data
-		for triangle_idx in triangles():
+		for triangle_idx in self.get_triangles().size():
 			_triangles_data.append({})
 			
 		_save()
-	
+
+# Create points on the terrain	
 func _create_points():
-	var rect = Rect2(Vector2(0, 0), Vector2(width, height))
+	var rect = Rect2(Vector2(0, 0), Vector2(_width, _height))
 	var poisson_disc_sampling: PoissonDiscSampling = PoissonDiscSampling.new()
-	var points2d = poisson_disc_sampling.generate_points(spacing, rect, 5)
+	var points2d = poisson_disc_sampling.generate_points(_spacing, rect, 5)
 	_points.resize(points2d.size())
 	for point_idx in points2d.size():
 		_points[point_idx].x = points2d[point_idx].x
 		_points[point_idx].z = points2d[point_idx].y
 	
+# Terrain methodes
 func get_triangles():
 	var triangles = Triangles.new(self)
 	return triangles
@@ -341,45 +334,34 @@ func get_edge(idx):
 	
 func get_triangle(idx):
 	return Triangle.new(idx, self)
-
-func triangles():
-	return _triangles.size() / 3
-	
-func points():
-	return _points.size()
-	
-func edges():
-	return _triangles.size()
-
-# Voronoi
-
-func centroid(points):
-  return Vector3((points[0].x + points[1].x + points[2].x) / 3.0, 0.0, (points[0].z + points[1].z + points[2].z) / 3.0)
-
 	
 func _save():
-	_file.open(terrain_file, File.WRITE)
-	_file.store_var(width)
-	_file.store_var(height)
-	_file.store_var(spacing)
+	_file.open(terrain_file % (_name), File.WRITE)
+	_file.store_var(_width)
+	_file.store_var(_height)
+	_file.store_var(_spacing)
+	_file.store_var(_name)
 	_file.store_var(_points)
 	_file.store_var(_halfedges)
 	_file.store_var(_triangles)
 	_file.store_var(_points_to_halfedges)
+	_file.store_var(_data)
 	_file.store_var(_points_data)
 	_file.store_var(_edges_data)
 	_file.store_var(_triangles_data)
 	_file.close()
 	
-func _load():
-	_file.open(terrain_file, File.READ)
-	width = _file.get_var()
-	height = _file.get_var()
-	spacing = _file.get_var()
+func _load(name):
+	_file.open(terrain_file % (name), File.READ)
+	_width = _file.get_var()
+	_height = _file.get_var()
+	_spacing = _file.get_var()
+	_name = _file.get_var()
 	_points = _file.get_var()
 	_halfedges = _file.get_var()
 	_triangles = _file.get_var()
 	_points_to_halfedges = _file.get_var()
+	_data = _file.get_var()
 	_points_data = _file.get_var()
 	_edges_data = _file.get_var()
 	_triangles_data = _file.get_var()

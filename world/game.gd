@@ -24,12 +24,12 @@ func _ready():
 	noise.octaves = octaves
 	terrain = Terrain.new(width,height,spacing,true)
 	init_points_data()
-	print(terrain.get_point(3))
+	# print(terrain.get_point(3))
 	emit_signal("world_loaded", terrain)
 
 func init_points_data():
-	for index in terrain.get_points().size():
-		terrain.get_point(index).set_elevation(find_elevation(terrain.get_point(index).point2d()))
+	for point in terrain.get_points():
+		point.set_elevation(find_elevation(point.point2d()))
 #		points_data.append({
 #			"elevation": 0,
 #			"used": false,

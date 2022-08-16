@@ -3,6 +3,8 @@ extends Node2D
 var terrain
 
 func create_map():
+	
+	Global.print_debug("Create river")
 	var river = {"size": 3, "color": "blue"}
 
 	terrain.get_edge(16).set_data("river", river)
