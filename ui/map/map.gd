@@ -42,10 +42,17 @@ func create_map():
 	
 
 func draw_triangles():
-	for polygon in terrain.get_triangles_as_polygon():
+	for triangle in terrain.get_triangles():
+		var colors = Gradient.new()
+		colors.add_point(0.999,  Color("#9e0142")) # red
+		colors.add_point(0.5,  Color("#dc865d")) # orange
+		colors.add_point(0.25,  Color("#fbf8b0")) # yellow
+		colors.add_point(0,  Color("#89cfa5")) # green
+		colors.add_point(-0.999,  Color("#5e4fa2")) # blue
 		var color = Color(randf(), randf(), randf(), 1)
-		if polygon.size() > 2:
-			draw_polygon(polygon, PoolColorArray([color]))
+		color = colors.interpolate(min(triangle.get_data("elevation"), 0.999))
+		if triangle.polygon().size() > 2:
+			draw_polygon(triangle.polygon(), PoolColorArray([color]))
 		
 func draw_triangles_edges(color=Color("#000000")):
 	for line in terrain.get_edges_as_line():

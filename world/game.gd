@@ -28,8 +28,8 @@ func _ready():
 	emit_signal("world_loaded", terrain)
 
 func init_points_data():
-	for index in terrain.get_points().size():
-		terrain.get_point(index).set_elevation(find_elevation(terrain.get_point(index).point2d()))
+	for point in terrain.get_points():
+		point.set_elevation(find_point_elevation(point.point2d()))
 #		points_data.append({
 #			"elevation": 0,
 #			"used": false,
@@ -39,8 +39,10 @@ func init_points_data():
 #			"mountain": false,
 #			"river": false
 #		})
+	for triangle in terrain.get_triangles():
+		triangle.set_data("elevation", find_triangle_elevation(triangle))
 
-func find_elevation(point):
+func find_point_elevation(point):
 	var border = border_width + rng.randf_range(-20.0, 20.0)
 	var elevation = noise.get_noise_2d(point.x / wavelength, point.y / wavelength)
 	
@@ -60,11 +62,12 @@ func find_elevation(point):
 		
 	elevation = min(elevation, 1)
 		
-	elevation = elevation * terraces
+	# elevation = elevation * terraces
 	return elevation
-#
-#	if points_data[point_id].elevation <= 0:
-#		points_data[point_id].water = true
-#
-#	if points_data[point_id].elevation >= mountain_height:
-#		points_data[point_id].mountain = true
+
+func find_triangle_elevation(triangle):
+	var elevation = 0
+	for point in triangle.points():
+		elevation += point.get_elevation()
+	elevation /= 3
+	return elevation
