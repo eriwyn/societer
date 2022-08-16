@@ -6,7 +6,7 @@ class Triangles:
 	var _terrain
 	var _curr
 	var _end
-	
+	sqdqsdqsdsq
 	func _init(terrain):
 		self._terrain = terrain
 		self._curr = 0
