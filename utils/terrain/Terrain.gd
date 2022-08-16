@@ -1,12 +1,14 @@
 extends Reference
 
+# Build terrain from delaunay graph
 class_name Terrain
 
+# Triangles iterator
 class Triangles:
 	var _terrain
 	var _curr
 	var _end
-	sqdqsdqsdsq
+
 	func _init(terrain):
 		self._terrain = terrain
 		self._curr = 0
