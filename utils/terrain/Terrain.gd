@@ -166,11 +166,11 @@ class Point:
 	func points_around():
 		var list_points = []
 		var incoming = _terrain._points_to_halfedges.get(_idx)
-		var incoming_edge = Point.new(incoming, _terrain)
+		var incoming_edge = Edge.new(incoming, _terrain)
 		var outgoing_edge
 		while true:
 			list_points.append(Point.new(_terrain._triangles[incoming_edge._idx], _terrain));
-			outgoing_edge = incoming_edge.next_half()
+			outgoing_edge = incoming_edge.opposite()
 			incoming_edge = Edge.new(_terrain._halfedges[outgoing_edge._idx], _terrain);
 			if not (incoming_edge._idx != -1 and incoming_edge._idx != incoming):
 				break

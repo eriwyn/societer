@@ -23,13 +23,14 @@ func _ready():
 	noise.seed = rng.randi()
 	noise.octaves = octaves
 	terrain = Terrain.new(width,height,spacing,true)
-	init_points_data()
+	init_data()
 	print(terrain)
 	emit_signal("world_loaded", terrain)
 
-func init_points_data():
+func init_data():
 	for point in terrain.get_points():
-		point.set_elevation(find_point_elevation(point.point2d()))
+		point.set_elevation(point_find_elevation(point.point2d()))
+		point.set_data("water", point_is_water(point))
 #		points_data.append({
 #			"elevation": 0,
 #			"used": false,
@@ -39,10 +40,19 @@ func init_points_data():
 #			"mountain": false,
 #			"river": false
 #		})
+	fill_oceans()
+	
 	for triangle in terrain.get_triangles():
-		triangle.set_data("elevation", find_triangle_elevation(triangle))
+		triangle.set_data("elevation", triangle_find_elevation(triangle))
+		triangle.set_data("water", triangle_is_water(triangle))
+		triangle.set_data("ocean", false)
+		for point in triangle.points():
+			if point.get_data("ocean"):
+				triangle.set_data("ocean", true)
+		
+# Point
 
-func find_point_elevation(point):
+func point_find_elevation(point):
 	var border = border_width + rng.randf_range(-20.0, 20.0)
 	var elevation = noise.get_noise_2d(point.x / wavelength, point.y / wavelength)
 	
@@ -64,10 +74,35 @@ func find_point_elevation(point):
 		
 	# elevation = elevation * terraces
 	return elevation
+	
+func point_is_water(point):
+	if (point.get_elevation() <= 0):
+		return true
+	return false
 
-func find_triangle_elevation(triangle):
+# Triangle
+
+func triangle_find_elevation(triangle):
 	var elevation = 0
 	for point in triangle.points():
 		elevation += point.get_elevation()
-	elevation /= 3
+	elevation /= 3.0
 	return elevation
+
+func triangle_is_water(triangle):
+	if triangle.get_data("elevation") <= 0:
+		return true
+	return false
+
+func fill_oceans():
+	var stack = []
+	for point in terrain.get_points():
+		if point.point2d().x < 10 and point.get_data("water") and not point.get_data("ocean"):
+			stack.append(point.get_index())
+			while stack.size():
+				var current_point_id = stack.pop_back()
+				terrain.get_point(current_point_id).set_data("ocean", true)
+				for neighbour in terrain.get_point(current_point_id).points_around():
+					if neighbour.get_data("water") and not neighbour.get_data("ocean"):
+						stack.append(neighbour.get_index())
+			break

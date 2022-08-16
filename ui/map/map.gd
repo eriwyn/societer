@@ -47,13 +47,27 @@ func draw_triangles():
 		colors.add_point(0.999,  Color("#9e0142")) # red
 		colors.add_point(0.5,  Color("#dc865d")) # orange
 		colors.add_point(0.25,  Color("#fbf8b0")) # yellow
-		colors.add_point(0,  Color("#89cfa5")) # green
+		colors.add_point(0,  Color.green) # green
 		colors.add_point(-0.999,  Color("#5e4fa2")) # blue
-		var color = Color(randf(), randf(), randf(), 1)
-		color = colors.interpolate(min(triangle.get_data("elevation"), 0.999))
+		var color = colors.interpolate(min(triangle.get_data("elevation"), 0.999))
+		if triangle.get_data("ocean"):
+			color = Color.red
 		if triangle.polygon().size() > 2:
 			draw_polygon(triangle.polygon(), PoolColorArray([color]))
-		
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 func draw_triangles_edges(color=Color("#000000")):
 	for line in terrain.get_edges_as_line():
 		draw_line(line[0], line[1], color)
@@ -121,4 +135,4 @@ func _draw():
 
 func _on_Game_world_loaded(game_terrain):
 	terrain = game_terrain
-	create_map()
+	update()
