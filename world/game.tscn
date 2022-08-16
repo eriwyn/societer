@@ -8,4 +8,6 @@ script = ExtResource( 2 )
 
 [node name="UI" parent="." instance=ExtResource( 1 )]
 
+[connection signal="world_loaded" from="." to="UI/Map" method="_on_Game_world_loaded"]
+
 [editable path="UI"]

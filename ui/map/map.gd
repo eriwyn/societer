@@ -4,7 +4,8 @@ var terrain
 
 func create_map():
 	var river = {"size": 3, "color": "blue"}
-
+	print(terrain)
+	print("a")
 	terrain.get_edge(16).set_data("river", river)
 	
 	var triangle_idx = 5
