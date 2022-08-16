@@ -2,6 +2,34 @@ extends Reference
 
 class_name Terrain
 
+class Triangles:
+	var _terrain
+	var _curr
+	var _end
+	
+	func _init(terrain):
+		self._terrain = terrain
+		self._curr = 0
+		self._end = _terrain._triangles.size() / 3
+		
+	func _should_continue():
+		return (_curr < _end)
+		
+	func _iter_init(arg):
+		_curr = 0
+		return _should_continue()
+		
+	func _iter_next(arg):
+		_curr += 1
+		return _should_continue()
+		
+	func _iter_get(arg):
+		var triangle = Triangle.new(_curr,_terrain)
+		return triangle
+		
+	func size():
+		return _end
+
 class Triangle:
 	var _idx
 	var _terrain
@@ -50,7 +78,40 @@ class Triangle:
 		var points = points()
 		return (points[0].point3d() + points[1].point3d() + points[2].point3d()) / 3.0
 		
+	func polygon():
+		var polygon = []
+		for point in points():
+			polygon.append(point.point2d())
+		return polygon
 		
+class Points:
+	var _terrain
+	var _curr
+	var _end
+	
+	func _init(terrain):
+		self._terrain = terrain
+		self._curr = 0
+		self._end = _terrain._points.size()
+		
+	func _should_continue():
+		return (_curr < _end)
+		
+	func _iter_init(arg):
+		_curr = 0
+		return _should_continue()
+		
+	func _iter_next(arg):
+		_curr += 1
+		return _should_continue()
+		
+	func _iter_get(arg):
+		var point = Point.new(_curr,_terrain)
+		return point
+		
+	func size():
+		return _end
+	
 class Point:
 	var _idx
 	var _terrain
@@ -112,6 +173,34 @@ class Point:
 			if not (incoming_edge._idx != -1 and incoming_edge._idx != incoming):
 				break
 		return list_points
+
+class Edges:
+	var _terrain
+	var _curr
+	var _end
+	
+	func _init(terrain):
+		self._terrain = terrain
+		self._curr = 0
+		self._end = _terrain._triangles.size()
+		
+	func _should_continue():
+		return (_curr < _end)
+		
+	func _iter_init(arg):
+		_curr = 0
+		return _should_continue()
+		
+	func _iter_next(arg):
+		_curr += 1
+		return _should_continue()
+		
+	func _iter_get(arg):
+		var edge = Edge.new(_curr,_terrain)
+		return edge
+		
+	func size():
+		return _end
 		
 class Edge:
 	var _idx
@@ -149,6 +238,9 @@ class Edge:
 		
 	func end():
 		return Point.new(_terrain._triangles[next_half()._idx], _terrain)
+	
+	func opposite():
+		return Edge.new(_terrain._halfedges[_idx], _terrain)
 		
 const terrain_file = "user://terrain.save"
 
@@ -228,14 +320,16 @@ func _create_points():
 		_points[point_idx].z = points2d[point_idx].y
 	
 func get_triangles():
-	return _triangles
+	var triangles = Triangles.new(self)
+	return triangles
 	
-func get_halfedges():
-	return _halfedges
+func get_edges():
+	var edges = Edges.new(self)
+	return edges
 
-# return que les id ?
 func get_points():
-	return _points
+	var points = Points.new(self)
+	return points
 	
 func get_point(idx):
 	return Point.new(idx, self)
@@ -291,18 +385,14 @@ func _load():
 	
 func get_triangles_as_polygon():
 	var list_polygon = []
-	for triangle_idx in triangles():
-		var polygon = []
-		for point in get_triangle(triangle_idx).points():
-			polygon.append(point.point2d())
-		list_polygon.append(polygon)
+	for triangle in get_triangles():
+		list_polygon.append(triangle.polygon())
 	return list_polygon
 	
 func get_edges_as_line():
 	var list_lines = []
-	for edge_idx in edges():
+	for edge in get_edges():
 		var line = []
-		var edge = get_edge(edge_idx)
 		line.append(edge.start().point2d())
 		line.append(edge.end().point2d())
 		list_lines.append(line)
@@ -310,11 +400,10 @@ func get_edges_as_line():
 	
 func get_voronoi_edges_as_line():
 	var list_lines = []
-	for edge_idx in edges():
+	for start_edge in get_edges():
 		var line = []
-		var start_edge = get_edge(edge_idx)
-		var end_edge = get_edge(_halfedges[edge_idx])
-		if (edge_idx < _halfedges[edge_idx]):
+		var end_edge = start_edge.opposite()
+		if (start_edge.get_index() < end_edge.get_index()):
 			line.append(start_edge.triangle().center2d())
 			line.append(end_edge.triangle().center2d())
 			list_lines.append(line)
@@ -322,8 +411,7 @@ func get_voronoi_edges_as_line():
 
 func get_voronoi_cells_as_polygon():
 	var list_polygon = []
-	for point_idx in points():
-		var point = get_point(point_idx)
+	for point in get_points():
 		var polygon = []
 		for edge in point.edges_around():
 			polygon.append(edge.triangle().center2d())
