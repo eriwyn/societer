@@ -11,7 +11,7 @@ export(int) var border_width = 200
 export(int) var terraces = 24
 export(int) var terrace_height = 5
 export(float) var mountain_height = 6.0 / 24.0
-export(int) var river_proba = 50
+export(int) var river_proba = 100
 
 var rng = RandomNumberGenerator.new()
 var noise = OpenSimplexNoise.new()
@@ -32,16 +32,7 @@ func init_data():
 		point.set_data("water", point_is_water(point))
 		point.set_data("mountain", point_is_mountain(point))
 		point.set_data("river", point_is_river(point))
-		
-#		points_data.append({
-#			"elevation": 0,
-#			"used": false,
-#			"water": false,
-#			"ocean": false,
-#			"coast": false,
-#			"mountain": false,
-#			"river": false
-#		})
+
 	fill_oceans()
 	
 	for point in terrain.get_points():
@@ -74,6 +65,7 @@ func fill_oceans():
 			break
 
 func set_river_path(point):
+	#TODO #2 fix rivers
 	var start_elevation = point.get_elevation()
 	var waypoints = []
 	var stack = []
@@ -91,7 +83,6 @@ func set_river_path(point):
 		if terrain.get_point(current_point_id).get_data("ocean"):
 			break
 		for neighbour in terrain.get_point(current_point_id).points_around():
-#			if points_data[neighbour].elevation <= start_elevation:
 			if not came_from.has(neighbour.get_index()):
 				stack.append(neighbour.get_index())
 				came_from[neighbour.get_index()] = current_point_id
@@ -156,6 +147,7 @@ func point_is_river(point):
 		if random == 1:
 			return true
 	return false
+
 # Triangle
 
 func triangle_find_elevation(triangle):
