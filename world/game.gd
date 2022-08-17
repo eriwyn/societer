@@ -1,4 +1,4 @@
-extends Spatial
+extends Node
 
 signal world_loaded
 
