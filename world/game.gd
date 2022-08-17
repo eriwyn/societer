@@ -24,7 +24,11 @@ func _ready():
 	noise.octaves = octaves
 	terrain = Terrain.new(width,height,spacing,true)
 	init_points_data()
+<<<<<<< HEAD
 	# print(terrain.get_point(3))
+=======
+	print(terrain)
+>>>>>>> 7594b7d05c95e46157d72da7c31083c3111996b1
 	emit_signal("world_loaded", terrain)
 
 func init_points_data():
