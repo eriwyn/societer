@@ -121,7 +121,7 @@ func point_find_elevation(point):
 		
 	elevation = min(elevation, 1)
 		
-	# elevation = elevation * terraces
+	elevation = round(elevation * terraces) / terraces
 	return elevation
 	
 func point_is_water(point):

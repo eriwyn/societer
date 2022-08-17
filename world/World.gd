@@ -13,7 +13,7 @@ func draw_world():
 	st.add_smooth_group(true)
 	for triangle in terrain.get_triangles():
 		for point in triangle.points():
-			st.add_vertex(point.point3d())
+			st.add_vertex(point.point3d() * Vector3(1, 24*5, 1))
 
 	st.generate_normals()
 	st.generate_tangents()
@@ -23,7 +23,7 @@ func draw_world():
 	
 	var mi = MeshInstance.new()
 	mi.mesh = mesh
-	var material = load("res://world/world.tres")
+	var material = load("res://world/world.material")
 	mi.set_surface_material(0, material)
 	mi.create_trimesh_collision()
 	mi.cast_shadow = GeometryInstance.SHADOW_CASTING_SETTING_ON
