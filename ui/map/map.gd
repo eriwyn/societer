@@ -8,7 +8,7 @@ func heightmap():
 		colors.add_point(0.999,  Color("#9e0142")) # red
 		colors.add_point(0.5,  Color("#dc865d")) # orange
 		colors.add_point(0.25,  Color("#fbf8b0")) # yellow
-		colors.add_point(0,  Color.green) # green
+		colors.add_point(0,  Color("#89cfa5")) # green
 		colors.add_point(-0.999,  Color("#5e4fa2")) # blue
 		var color = colors.interpolate(min(triangle.get_data("elevation"), 0.999))
 		if triangle.get_data("ocean"):
@@ -17,7 +17,12 @@ func heightmap():
 		if triangle.polygon().size() > 2:
 			draw_polygon(triangle.polygon(), PoolColorArray([color]))
 
-
+	var coastline = PoolVector2Array()
+	for edge in terrain.get_edges():
+		if edge.get_data("coast"):
+			coastline.append(edge.line()[0])
+			coastline.append(edge.line()[1])
+	draw_multiline(coastline, Color.black, 5.0)
 
 
 

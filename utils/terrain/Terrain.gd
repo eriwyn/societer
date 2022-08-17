@@ -243,7 +243,13 @@ class Edge:
 	
 	func opposite():
 		return Edge.new(_terrain._halfedges[_idx], _terrain)
-		
+	
+	func line():
+		var line = []
+		line.append(start().point2d())
+		line.append(end().point2d())
+		return line
+
 const terrain_file = "user://terrain.save"
 
 var width: int
