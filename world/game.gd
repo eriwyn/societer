@@ -36,6 +36,8 @@ func init_data():
 	fill_oceans()
 	
 	for point in terrain.get_points():
+		if point.get_data("water") and not point.get_data("ocean"):
+			point.set_elevation(0.1)
 		point.set_data("coast", point_is_coast(point))
 		if point.get_data("river"):
 			set_river_path(point)
