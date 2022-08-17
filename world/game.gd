@@ -31,6 +31,7 @@ func init_data():
 	for point in terrain.get_points():
 		point.set_elevation(point_find_elevation(point.point2d()))
 		point.set_data("water", point_is_water(point))
+		point.set_data("mountain", point_is_mountain(point))
 #		points_data.append({
 #			"elevation": 0,
 #			"used": false,
@@ -42,14 +43,31 @@ func init_data():
 #		})
 	fill_oceans()
 	
+	for point in terrain.get_points():
+		point.set_data("coast", point_is_coast(point))
 	for triangle in terrain.get_triangles():
 		triangle.set_data("elevation", triangle_find_elevation(triangle))
 		triangle.set_data("water", triangle_is_water(triangle))
 		triangle.set_data("ocean", false)
+		# TODO #1 : Get triangles around point
 		for point in triangle.points():
 			if point.get_data("ocean"):
 				triangle.set_data("ocean", true)
-		
+	for edge in terrain.get_edges():
+		edge.set_data("coast", edge_is_coast(edge))
+func fill_oceans():
+	var stack = []
+	for point in terrain.get_points():
+		if point.point2d().x < 10 and point.get_data("water") and not point.get_data("ocean"):
+			stack.append(point.get_index())
+			while stack.size():
+				var current_point_id = stack.pop_back()
+				terrain.get_point(current_point_id).set_data("ocean", true)
+				for neighbour in terrain.get_point(current_point_id).points_around():
+					if neighbour.get_data("water") and not neighbour.get_data("ocean"):
+						stack.append(neighbour.get_index())
+			break
+
 # Point
 
 func point_find_elevation(point):
@@ -80,6 +98,18 @@ func point_is_water(point):
 		return true
 	return false
 
+func point_is_mountain(point):
+	if (point.get_elevation() >= mountain_height):
+		return true
+	return false
+
+func point_is_coast(point):
+	if not point.get_data("water"):
+		for neighbour in point.points_around():
+			if neighbour.get_data("ocean"):
+				return true
+	return false
+
 # Triangle
 
 func triangle_find_elevation(triangle):
@@ -94,15 +124,9 @@ func triangle_is_water(triangle):
 		return true
 	return false
 
-func fill_oceans():
-	var stack = []
-	for point in terrain.get_points():
-		if point.point2d().x < 10 and point.get_data("water") and not point.get_data("ocean"):
-			stack.append(point.get_index())
-			while stack.size():
-				var current_point_id = stack.pop_back()
-				terrain.get_point(current_point_id).set_data("ocean", true)
-				for neighbour in terrain.get_point(current_point_id).points_around():
-					if neighbour.get_data("water") and not neighbour.get_data("ocean"):
-						stack.append(neighbour.get_index())
-			break
+# Edge
+
+func edge_is_coast(edge):
+	if edge.start().get_data("coast") and edge.end().get_data("coast") and edge.triangle().get_data("ocean"):
+		return true
+	return false
