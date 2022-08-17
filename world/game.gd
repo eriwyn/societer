@@ -24,6 +24,7 @@ func _ready():
 	noise.octaves = octaves
 	terrain = Terrain.new(width,height,spacing,true)
 	init_data()
+	add_trees()
 	emit_signal("world_loaded", terrain)
 
 func init_data():
@@ -38,6 +39,7 @@ func init_data():
 	for point in terrain.get_points():
 		if point.get_data("water") and not point.get_data("ocean"):
 			point.set_elevation(0.1)
+			point.set_data("water", false)
 		point.set_data("coast", point_is_coast(point))
 		if point.get_data("river"):
 			set_river_path(point)
@@ -121,7 +123,7 @@ func point_find_elevation(point):
 		
 	elevation = min(elevation, 1)
 		
-	elevation = round(elevation * terraces) / terraces
+	# elevation = round(elevation * terraces) / terraces
 	return elevation
 	
 func point_is_water(point):
@@ -173,3 +175,23 @@ func edge_is_river(edge):
 	if edge.start().get_data("river") and edge.end().get_data("river"):
 		return true
 	return false
+
+func add_trees():
+	rng.randomize()
+	var treescene = load("res://entities/environment/birchtree/birchtree.tscn")
+	for point in terrain.get_points():
+		if not point.get_data("water"):
+			var num = rng.randi_range(0, 5)
+			if num == 1:
+				var tree = treescene.instance()
+				tree.translation = Vector3(point.point3d() * Vector3(1, 24*5, 1))
+				add_child(tree)
+
+	# for point in points.size():
+	# 	if points_data[i].elevation > 0:
+	# 		var num = rng.randi_range(0, 20)
+	# 		if num == 2:
+	# 			var tree = treescene.instance()
+	# 			tree.translation = Vector3(points[i].x, points_data[i].elevation * terrace_height, points[i].y)
+
+	# 			add_child(tree)

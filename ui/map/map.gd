@@ -104,7 +104,7 @@ func _draw():
 	# draw_voronoi_cells_convex_hull()
 #	draw_voronoi_edges(Color("#ff0000"))
 
-func _process(delta):
+func _process(_delta):
 	if Input.is_action_pressed("alt_command"):
 		var new_position = get_viewport().get_mouse_position() / scale
 		if new_position.x <= 2000 and new_position.y <= 2000:

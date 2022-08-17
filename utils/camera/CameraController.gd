@@ -78,7 +78,7 @@ func move(_velocity : Vector2):
 		y_offset = result.position.y
 	else:
 		y_offset = 0
-	global_transform.origin.y = max(10 + y_offset * 1.3, 30)
+	global_transform.origin.y = max(5 + y_offset * 1.3, 10)
 
 	emit_signal("camera_moved", global_transform.origin)
 

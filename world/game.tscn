@@ -38,14 +38,16 @@ environment = ExtResource( 3 )
 [node name="CamBase" parent="World" instance=ExtResource( 5 )]
 
 [node name="Camera" parent="World/CamBase" index="0"]
+transform = Transform( 1, 0, 0, 0, 0.910272, -0.41401, 0, 0.41401, 0.910272, 0, -1.90735e-06, 6.618 )
 movement_speed = 48.076
 min_zoom = 10.0
 zoom_sensibility = 1.436
 rotation_sensibility = 3.0
 
 [node name="DirectionalLight" type="DirectionalLight" parent="World"]
-transform = Transform( 1, 0, 0, 0, 0.41636, 0.9092, 0, -0.9092, 0.41636, 0, 1.41623, 0 )
+transform = Transform( 1, 0, 0, 0, 0.512597, 0.858629, 0, -0.858629, 0.512597, 0, 1.41623, 0 )
 light_energy = 0.1
+shadow_enabled = true
 
 [connection signal="world_loaded" from="." to="UI/Map" method="_on_Game_world_loaded"]
 [connection signal="world_loaded" from="." to="World" method="_on_Game_world_loaded"]
