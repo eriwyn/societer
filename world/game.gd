@@ -71,7 +71,6 @@ func set_river_path(point):
 	var start_elevation = point.get_elevation()
 	var waypoints = []
 	var stack = []
-	var end
 	stack.append(point.get_index())
 	var came_from = {}
 	
@@ -81,7 +80,6 @@ func set_river_path(point):
 			waypoints.append(current_point_id)
 			start_elevation = terrain.get_point(current_point_id).get_elevation()
 			stack = []
-			end = current_point_id
 		if terrain.get_point(current_point_id).get_data("ocean"):
 			break
 		for neighbour in terrain.get_point(current_point_id).points_around():
