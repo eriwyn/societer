@@ -1,12 +1,14 @@
 extends Reference
 
+# Build terrain from delaunay graph
 class_name Terrain
 
+# Triangles iterator
 class Triangles:
 	var _terrain
 	var _curr
 	var _end
-	
+
 	func _init(terrain):
 		self._terrain = terrain
 		self._curr = 0
@@ -164,7 +166,7 @@ class Point:
 	func points_around():
 		var list_points = []
 		var incoming = _terrain._points_to_halfedges.get(_idx)
-		var incoming_edge = Point.new(incoming, _terrain)
+		var incoming_edge = Edge.new(incoming, _terrain)
 		var outgoing_edge
 		while true:
 			list_points.append(Point.new(_terrain._triangles[incoming_edge._idx], _terrain));
@@ -241,7 +243,13 @@ class Edge:
 	
 	func opposite():
 		return Edge.new(_terrain._halfedges[_idx], _terrain)
-		
+	
+	func line():
+		var line = []
+		line.append(start().point2d())
+		line.append(end().point2d())
+		return line
+
 const terrain_file = "user://terrain.save"
 
 var width: int

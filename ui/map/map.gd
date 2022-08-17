@@ -2,50 +2,41 @@ extends Node2D
 
 var terrain
 
-func create_map():
-	var river = {"size": 3, "color": "blue"}
+func heightmap():
+	for triangle in terrain.get_triangles():
+		var colors = Gradient.new()
+		colors.add_point(0.999,  Color("#9e0142")) # red
+		colors.add_point(0.5,  Color("#dc865d")) # orange
+		colors.add_point(0.25,  Color("#fbf8b0")) # yellow
+		colors.add_point(0,  Color("#89cfa5")) # green
+		colors.add_point(-0.999,  Color("#5e4fa2")) # blue
+		var color = colors.interpolate(min(triangle.get_data("elevation"), 0.999))
+		if triangle.get_data("ocean"):
+			var factor = pow((triangle.get_data("elevation")+1), 10) / 5.0
+			color = Color("#5e4fa2") + Color(factor, factor, factor, 0.0)
+		if triangle.polygon().size() > 2:
+			draw_polygon(triangle.polygon(), PoolColorArray([color]))
 
-	terrain.get_edge(16).set_data("river", river)
-	
-	var triangle_idx = 5
-	var triangle = terrain.get_triangle(triangle_idx)
-	
-	print("Triangle index : %d" % (triangle.get_index()))
-	
-	var edges = triangle.edges()
-	
-	print("Number of edges : %d" % (edges.size()))
-	print()
-	
-	for edge in edges:
-		print("Edge index : %d" % (edge.get_index()))
-		var start_point = edge.start()
-		var end_point = edge.end()
-		var start = start_point.point2d()
-		var end = end_point.point2d()
-		
-		print("Start point index : %d" % (start_point.get_index()))
-		print("End point index : %d" % (end_point.get_index()))
+	var coastline = PoolVector2Array()
+	for edge in terrain.get_edges():
+		if edge.get_data("coast"):
+			coastline.append(edge.line()[0])
+			coastline.append(edge.line()[1])
+		if edge.get_data("river"):
+			draw_line(edge.line()[0], edge.line()[1], Color.blue, 5.0)
+	draw_multiline(coastline, Color.black)
 
-		print("Start point : %s" % (start))
-		print("End point : %s" % (end))
-		
-		if edge.has_key("river"):
-			print("Has river")
-			var a_river = edge.get_data("river")
-			print("River size : %d" % (a_river["size"]))
-			print("River color : %s" % (a_river["color"]))
-		
-		print()
-		print(terrain.get_point(5).point3d())
-	
 
-func draw_triangles():
-	for polygon in terrain.get_triangles_as_polygon():
-		var color = Color(randf(), randf(), randf(), 1)
-		if polygon.size() > 2:
-			draw_polygon(polygon, PoolColorArray([color]))
-		
+
+
+
+
+
+
+
+
+
+
 func draw_triangles_edges(color=Color("#000000")):
 	for line in terrain.get_edges_as_line():
 		draw_line(line[0], line[1], color)
@@ -105,7 +96,7 @@ func draw_voronoi_cells_convex_hull():
 	
 func _draw():
 	print("before drawing")
-	draw_triangles()
+	heightmap()
 #	draw_voronoi_cells()
 #	draw_triangles_edges()
 	# draw_voronoi_cells_convex_hull()
@@ -113,4 +104,4 @@ func _draw():
 
 func _on_Game_world_loaded(game_terrain):
 	terrain = game_terrain
-	create_map()
+	update()
