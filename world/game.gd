@@ -24,7 +24,7 @@ func _ready():
 	noise.octaves = octaves
 	# terrain = Terrain.new(width,height,spacing,false)
 	
-	var terrain_name="bonjour"
+	var terrain_name="bonjourazeazea"
 	terrain = Terrain.new()
 
 	print(terrain.list())
@@ -48,7 +48,7 @@ func init_data():
 		point.set_elevation(point_find_elevation(point.point2d()))
 		point.set_data("water", point_is_water(point))
 		point.set_data("mountain", point_is_mountain(point))
-		point.set_data("river", point_is_river(point))
+		# point.set_data("river", point_is_river(point))
 
 	fill_oceans()
 	
@@ -141,7 +141,7 @@ func point_find_elevation(point):
 		
 	elevation = min(elevation, 1)
 		
-	# elevation = round(elevation * terraces) / terraces
+	elevation = round(elevation * terraces) / terraces
 	return elevation
 	
 func point_is_water(point):
