@@ -4,14 +4,14 @@ signal world_loaded
 
 export(int) var width = 2000
 export(int) var height = 2000
-export(int) var spacing = 20
+export(int) var spacing = 5
 export(int, 1, 9) var octaves = 5
 export(int, 1, 30) var wavelength = 8
 export(int) var border_width = 200
 export(int) var terraces = 24
 export(int) var terrace_height = 5
 export(float) var mountain_height = 6.0 / 24.0
-export(int) var river_proba = 100
+export(int) var river_proba = 200
 
 var rng = RandomNumberGenerator.new()
 var noise = OpenSimplexNoise.new()
@@ -100,6 +100,7 @@ func set_river_path(point):
 	path.append(point.get_index())
 	for index in path:
 		terrain.get_point(index).set_data("river", true)
+		terrain.get_point(index).set_data("water", true)
 
 # Point
 
