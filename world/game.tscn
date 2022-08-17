@@ -1,9 +1,10 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=7 format=2]
 
 [ext_resource path="res://ui/ui.tscn" type="PackedScene" id=1]
 [ext_resource path="res://world/game.gd" type="Script" id=2]
 [ext_resource path="res://world/default_env.tres" type="Environment" id=3]
 [ext_resource path="res://world/World.gd" type="Script" id=4]
+[ext_resource path="res://utils/camera/CamBase.tscn" type="PackedScene" id=5]
 
 [sub_resource type="PlaneMesh" id=1]
 size = Vector2( 2000, 2000 )
@@ -12,6 +13,9 @@ size = Vector2( 2000, 2000 )
 script = ExtResource( 2 )
 
 [node name="UI" parent="." instance=ExtResource( 1 )]
+
+[node name="Map" parent="UI" index="0"]
+scale = Vector2( 0.25, 0.25 )
 
 [node name="World" type="Spatial" parent="."]
 script = ExtResource( 4 )
@@ -23,12 +27,10 @@ mesh = SubResource( 1 )
 [node name="WorldEnvironment" type="WorldEnvironment" parent="World"]
 environment = ExtResource( 3 )
 
-[node name="Camera" type="Camera" parent="World"]
-transform = Transform( 1, 0, 0, 0, 0.509837, 0.860271, 0, -0.860271, 0.509837, 0, 5.05008, 66.6125 )
-near = 0.01
-far = 8192.0
+[node name="CamBase" parent="World" instance=ExtResource( 5 )]
 
 [connection signal="world_loaded" from="." to="UI/Map" method="_on_Game_world_loaded"]
 [connection signal="world_loaded" from="." to="World" method="_on_Game_world_loaded"]
 
 [editable path="UI"]
+[editable path="World/CamBase"]

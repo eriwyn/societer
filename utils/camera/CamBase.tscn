@@ -1,0 +1,33 @@
+[gd_scene load_steps=5 format=2]
+
+[ext_resource path="res://utils/camera/SelectionBox.gd" type="Script" id=1]
+[ext_resource path="res://utils/camera/CamBase.gd" type="Script" id=2]
+[ext_resource path="res://utils/camera/CameraController.gd" type="Script" id=3]
+[ext_resource path="res://utils/camera/CameraInput.gd" type="Script" id=4]
+
+[node name="CamBase" type="Spatial"]
+transform = Transform( 1, 0, 0, 0, 0.34202, 0.939693, 0, -0.939693, 0.34202, 0, 0, 0 )
+script = ExtResource( 2 )
+
+[node name="Camera" type="Camera" parent="."]
+size = 20.0
+near = 0.01
+far = 8192.0
+script = ExtResource( 3 )
+movement_speed = 70.017
+min_zoom = 51.0
+zoom_sensibility = 2.818
+rotation_sensibility = 1.0
+
+[node name="Node" type="Node" parent="Camera"]
+script = ExtResource( 4 )
+
+[node name="SelectionBox" type="Control" parent="."]
+margin_right = 40.0
+margin_bottom = 40.0
+script = ExtResource( 1 )
+
+[connection signal="on_change_action" from="Camera/Node" to="Camera" method="change_action"]
+[connection signal="on_change_velocity" from="Camera/Node" to="Camera" method="change_velocity"]
+[connection signal="on_rotate_view" from="Camera/Node" to="Camera" method="rotate_view"]
+[connection signal="on_zoom" from="Camera/Node" to="Camera" method="zoom"]
