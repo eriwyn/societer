@@ -22,7 +22,9 @@ func heightmap():
 		if edge.get_data("coast"):
 			coastline.append(edge.line()[0])
 			coastline.append(edge.line()[1])
-	draw_multiline(coastline, Color.black, 5.0)
+		if edge.get_data("river"):
+			draw_line(edge.line()[0], edge.line()[1], Color.blue, 5.0)
+	draw_multiline(coastline, Color.black)
 
 
 
