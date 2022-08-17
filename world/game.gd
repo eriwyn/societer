@@ -22,10 +22,25 @@ func _ready():
 	rng.randomize()
 	noise.seed = rng.randi()
 	noise.octaves = octaves
-	terrain = Terrain.new(width,height,spacing,true)
-	init_data()
-	add_trees()
-	emit_signal("world_loaded", terrain)
+	# terrain = Terrain.new(width,height,spacing,false)
+	
+	var terrain_name="bonjour"
+	terrain = Terrain.new()
+
+	print(terrain.list())
+	
+	if terrain.exists(terrain_name):
+		terrain.load(terrain_name)
+	else:
+		terrain.create(width,height,spacing,"bonjour")
+
+	if terrain.is_created() or terrain.is_loaded():
+		init_data()
+		emit_signal("world_loaded", terrain)
+	else:
+		Global.print_debug("Pas de terrain, pas de construction ...")
+		Global.print_debug("Pas de construction ..., pas de palais ...")
+		Global.print_debug("Pas de palais ..., pas de palais.")
 
 func init_data():
 	for point in terrain.get_points():
@@ -105,6 +120,7 @@ func set_river_path(point):
 # Point
 
 func point_find_elevation(point):
+
 	var border = border_width + rng.randf_range(-20.0, 20.0)
 	var elevation = noise.get_noise_2d(point.x / wavelength, point.y / wavelength)
 	
