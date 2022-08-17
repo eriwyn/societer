@@ -36,6 +36,7 @@ func _ready():
 
 	if terrain.is_created() or terrain.is_loaded():
 		init_data()
+		add_trees()
 		emit_signal("world_loaded", terrain)
 	else:
 		Global.print_debug("Pas de terrain, pas de construction ...")
