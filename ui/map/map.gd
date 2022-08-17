@@ -25,18 +25,7 @@ func heightmap():
 		if edge.get_data("river"):
 			draw_line(edge.line()[0], edge.line()[1], Color.blue, 5.0)
 	draw_multiline(coastline, Color.black)
-
-
-
-
-
-
-
-
-
-
-
-
+	
 func draw_triangles_edges(color=Color("#000000")):
 	for line in terrain.get_edges_as_line():
 		draw_line(line[0], line[1], color)
