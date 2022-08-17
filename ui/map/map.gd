@@ -12,7 +12,8 @@ func heightmap():
 		colors.add_point(-0.999,  Color("#5e4fa2")) # blue
 		var color = colors.interpolate(min(triangle.get_data("elevation"), 0.999))
 		if triangle.get_data("ocean"):
-			color = Color.red
+			var factor = pow((triangle.get_data("elevation")+1), 10) / 5.0
+			color = Color("#5e4fa2") + Color(factor, factor, factor, 0.0)
 		if triangle.polygon().size() > 2:
 			draw_polygon(triangle.polygon(), PoolColorArray([color]))
 
