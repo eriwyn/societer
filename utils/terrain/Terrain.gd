@@ -256,7 +256,6 @@ class Edge:
 		return line
 
 # Terrain instance variables
-const terrain_file = "user://terrain_%s.save"
 
 var _width: int
 var _height: int
@@ -270,44 +269,79 @@ var _data = {}
 var _points_data = []
 var _edges_data = []
 var _triangles_data = []
-var _file = File.new()
+
+var _created = false
+var _loaded = false
+var _list = []
 
 # Terrain constructor
-func _init(width:int=1600, height:int=800, spacing:int=30, create=false, name:String="delaunay"):
-	if _file.file_exists(terrain_file) and not create:
+func _init(width:int=1600, height:int=800, spacing:int=30, create=false, name:String=""):
+	var terrain_dir = Directory.new()
+	terrain_dir.open("user://")
+	if not terrain_dir.dir_exists("terrain"):
+		terrain_dir.make_dir("terrain")
+	terrain_dir.change_dir("terrain")
+	terrain_dir.list_dir_begin()
+	var filename = terrain_dir.get_next()
+	while filename != "":
+		if terrain_dir.file_exists(filename):
+			# Ok terrain file found
+			var terrain = {}
+			var terrain_filename = "user://terrain/%s" % (filename)
+			var file = File.new()
+			file.open(terrain_filename, File.READ)
+			terrain["width"] = file.get_var()
+			terrain["height"] = file.get_var()
+			terrain["spacing"] = file.get_var()
+			terrain["name"] = file.get_var()
+			file.close()
+			_list.append(terrain)
+		filename = terrain_dir.get_next()
+	terrain_dir.list_dir_end()
+	
+	var file = File.new()
+	var terrain_filename = "user://terrain/terrain_%s.save" % (name)
+	if file.file_exists(terrain_filename) and not create:
 		Global.print_debug("loading : %s ..." % (name))
-		_load(name)
+		load(name)
 	else:
-		Global.print_debug("Creating : %s ..." % (name))
-		var delaunay: Delaunator
-		_width = width
-		_height = height
-		_spacing = spacing
-		_create_points()
-		delaunay = Delaunator.new(_points)
+		if name:
+			create(width, height, spacing, name)
+
+		
+func create(width:int, height:int, spacing:int, name:String):
+	Global.print_debug("Creating : %s ..." % (name))
+	var delaunay: Delaunator
+	_width = width
+	_height = height
+	_spacing = spacing
+	_name = name
+	_create_points()
+	delaunay = Delaunator.new(_points)
 	
-		_halfedges = PoolIntArray(delaunay.halfedges)
-		_triangles = PoolIntArray(delaunay.triangles)
+	_halfedges = PoolIntArray(delaunay.halfedges)
+	_triangles = PoolIntArray(delaunay.triangles)
 	
-		# Initialize _points_to_halfedges
-		for edge in get_edges():
-			var endpoint = _triangles[edge.next_half().get_index()]
-			if (! _points_to_halfedges.has(endpoint) or _halfedges[edge.get_index()] == -1):
-				_points_to_halfedges[endpoint] = edge.get_index()
-			
-		# Initialise _points_data
-		for point_idx in self.get_points().size():
-			_points_data.append({})
+	# Initialize _points_to_halfedges
+	for edge in get_edges():
+		var endpoint = _triangles[edge.next_half().get_index()]
+		if (! _points_to_halfedges.has(endpoint) or _halfedges[edge.get_index()] == -1):
+			_points_to_halfedges[endpoint] = edge.get_index()
+		
+	# Initialise _points_data
+	for point_idx in self.get_points().size():
+		_points_data.append({})
 	
-		# Initialise _edges_data
-		for edge_idx in self.get_edges().size():
-			_edges_data.append({})
+	# Initialise _edges_data
+	for edge_idx in self.get_edges().size():
+		_edges_data.append({})
 	
-		# Initialise _triangle_data
-		for triangle_idx in self.get_triangles().size():
-			_triangles_data.append({})
-			
-		_save()
+	# Initialise _triangle_data
+	for triangle_idx in self.get_triangles().size():
+		_triangles_data.append({})
+	
+	_created = true
+	save()
 
 # Create points on the terrain	
 func _create_points():
@@ -341,37 +375,71 @@ func get_edge(idx):
 func get_triangle(idx):
 	return Triangle.new(idx, self)
 	
-func _save():
-	_file.open(terrain_file % (_name), File.WRITE)
-	_file.store_var(_width)
-	_file.store_var(_height)
-	_file.store_var(_spacing)
-	_file.store_var(_name)
-	_file.store_var(_points)
-	_file.store_var(_halfedges)
-	_file.store_var(_triangles)
-	_file.store_var(_points_to_halfedges)
-	_file.store_var(_data)
-	_file.store_var(_points_data)
-	_file.store_var(_edges_data)
-	_file.store_var(_triangles_data)
-	_file.close()
+func save():
+	var terrain_dir = Directory.new()
+	var file = File.new()
+	var terrain_filename = "user://terrain/terrain_%s.save" % (_name)
+	terrain_dir.open("user://")
+	if not terrain_dir.dir_exists("terrain"):
+		terrain_dir.make_dir("terrain")
+	terrain_dir.change_dir("terrain")
+	Global.print_debug("Save file : %s" % (terrain_filename))
+	file.open(terrain_filename, File.WRITE)
+	file.store_var(_width)
+	file.store_var(_height)
+	file.store_var(_spacing)
+	file.store_var(_name)
+	file.store_var(_points)
+	file.store_var(_halfedges)
+	file.store_var(_triangles)
+	file.store_var(_points_to_halfedges)
+	file.store_var(_data)
+	file.store_var(_points_data)
+	file.store_var(_edges_data)
+	file.store_var(_triangles_data)
+	file.close()
 	
-func _load(name):
-	_file.open(terrain_file % (name), File.READ)
-	_width = _file.get_var()
-	_height = _file.get_var()
-	_spacing = _file.get_var()
-	_name = _file.get_var()
-	_points = _file.get_var()
-	_halfedges = _file.get_var()
-	_triangles = _file.get_var()
-	_points_to_halfedges = _file.get_var()
-	_data = _file.get_var()
-	_points_data = _file.get_var()
-	_edges_data = _file.get_var()
-	_triangles_data = _file.get_var()
-	_file.close()
+func load(name):
+	var terrain_dir = Directory.new()
+	var file = File.new()
+	var terrain_filename = "user://terrain/terrain_%s.save" % (name)
+	terrain_dir.open("user://")
+	if not terrain_dir.dir_exists("terrain"):
+		terrain_dir.make_dir("terrain")
+	if terrain_dir.file_exists(terrain_filename):
+		Global.print_debug("Load file : %s" % (terrain_filename))
+		file.open(terrain_filename, File.READ)
+		_width = file.get_var()
+		_height = file.get_var()
+		_spacing = file.get_var()
+		_name = file.get_var()
+		_points = file.get_var()
+		_halfedges = file.get_var()
+		_triangles = file.get_var()
+		_points_to_halfedges = file.get_var()
+		_data = file.get_var()
+		_points_data = file.get_var()
+		_edges_data = file.get_var()
+		_triangles_data = file.get_var()
+		file.close()
+		_loaded = true
+	else:
+		Global.print_debug("The file : %s does not exist" % (terrain_filename))
+	
+func list():
+	return _list
+
+func is_created():
+	return _created
+	
+func is_loaded():
+	return _loaded
+	
+func exists(name):
+	for terrain in _list:
+		if name == terrain["name"]:
+			return true
+	return false
 	
 func get_triangles_as_polygon():
 	var list_polygon = []
