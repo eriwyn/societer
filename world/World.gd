@@ -16,7 +16,7 @@ func draw_world():
 			st.add_vertex(point.point3d() * Vector3(1, 24*5, 1))
 
 	st.generate_normals()
-	st.generate_tangents()
+	# st.generate_tangents()
 	st.index()
 	# Commit to a mesh.
 	var mesh = st.commit()
@@ -33,3 +33,4 @@ func draw_world():
 func _on_Game_world_loaded(game_terrain):
 	terrain = game_terrain
 	draw_world()
+
