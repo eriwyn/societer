@@ -1,5 +1,7 @@
 extends Node2D
 
+signal map_clicked
+
 var terrain
 
 func heightmap():
@@ -90,6 +92,12 @@ func _draw():
 #	draw_triangles_edges()
 	# draw_voronoi_cells_convex_hull()
 #	draw_voronoi_edges(Color("#ff0000"))
+
+func _process(_delta):
+	if Input.is_action_pressed("alt_command"):
+		var new_position = get_viewport().get_mouse_position() / scale
+		if new_position.x <= 2000 and new_position.y <= 2000:
+			emit_signal("map_clicked", new_position)
 
 func _on_Game_world_loaded(game_terrain):
 	terrain = game_terrain
