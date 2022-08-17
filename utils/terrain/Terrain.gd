@@ -170,7 +170,7 @@ class Point:
 		var outgoing_edge
 		while true:
 			list_points.append(Point.new(_terrain._triangles[incoming_edge._idx], _terrain));
-			outgoing_edge = incoming_edge.opposite()
+			outgoing_edge = incoming_edge.next_half()
 			incoming_edge = Edge.new(_terrain._halfedges[outgoing_edge._idx], _terrain);
 			if not (incoming_edge._idx != -1 and incoming_edge._idx != incoming):
 				break
