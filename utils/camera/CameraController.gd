@@ -25,6 +25,7 @@ export(float, 1,3) var zoom_sensibility = 2.5
 
 export(float, 1,3) var rotation_sensibility = 2.3
 export(float, 1.0, 10.0) var height = 5.0
+
 var pitch : float
 var yaw : float
 var current_action = CAMERA_ACTIONS.MOVING
@@ -78,7 +79,7 @@ func move(_velocity : Vector2):
 		y_offset = result.position.y
 	else:
 		y_offset = 0
-	global_transform.origin.y = max(5 + y_offset * 1.3, 10)
+	global_transform.origin.y = max(15 + y_offset * 1.3, 10)
 
 	emit_signal("camera_moved", global_transform.origin)
 

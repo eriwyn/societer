@@ -73,7 +73,7 @@ class Triangle:
 			if opposite._idx >= 0:
 				list_triangles.append(opposite.triangle())
 		return list_triangles
-		
+
 	func center2d():
 		var points = points()
 		return (points[0].point2d() + points[1].point2d() + points[2].point2d()) / 3.0
@@ -247,6 +247,9 @@ class Edge:
 		
 	func triangle():
 		return Triangle.new(floor(_idx / 3), _terrain)
+
+	func opposite_triangle():
+		return opposite().triangle()
 		
 	func start():
 		return Point.new(_terrain._triangles[_idx], _terrain)

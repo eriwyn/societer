@@ -8,7 +8,7 @@ export(int) var spacing = 20
 export(int, 1, 9) var octaves = 5
 export(int, 1, 30) var wavelength = 8
 export(int) var border_width = 200
-export(int) var terraces = 12
+export(int) var terraces = 10
 export(int) var terrace_height = 5
 export(float) var mountain_height = 6.0 / 24.0
 export(int) var river_proba = 200
@@ -43,21 +43,21 @@ func _ready():
 		Global.print_debug("Pas de palais ..., pas de palais.")
 
 func init_data():
-	for point in terrain.get_points():
-		point.set_elevation(point_find_elevation(point.point2d()))
-		point.set_data("water", point_is_water(point))
-		point.set_data("mountain", point_is_mountain(point))
+	# for point in terrain.get_points():
+		# point.set_elevation(point_find_elevation(point.point2d()))
+		# point.set_data("water", point_is_water(point))
+		# point.set_data("mountain", point_is_mountain(point))
 		# point.set_data("river", point_is_river(point))
 
-	fill_oceans()
+	# fill_oceans()
 	
-	for point in terrain.get_points():
-		if point.get_data("water") and not point.get_data("ocean"):
-			point.set_elevation(0.1)
-			point.set_data("water", false)
-		point.set_data("coast", point_is_coast(point))
-		if point.get_data("river"):
-			set_river_path(point)
+	# for point in terrain.get_points():
+	# 	if point.get_data("water") and not point.get_data("ocean"):
+	# 		point.set_elevation(0.1)
+	# 		point.set_data("water", false)
+	# 	point.set_data("coast", point_is_coast(point))
+	# 	if point.get_data("river"):
+	# 		set_river_path(point)
 	for triangle in terrain.get_triangles():
 		triangle.set_elevation(point_find_elevation(triangle.center2d()))
 		# triangle.set_data("elevation", triangle_find_elevation(triangle))
@@ -202,5 +202,5 @@ func add_trees():
 			var num = rng.randi_range(0, 5)
 			if num == 1:
 				var tree = treescene.instance()
-				tree.translation = Vector3(point.point3d() * Vector3(1, 24*5, 1))
+				tree.translation = Vector3(point.point3d() * Vector3(1, 12*10, 1))
 				add_child(tree)
