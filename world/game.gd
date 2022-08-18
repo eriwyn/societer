@@ -22,7 +22,6 @@ func _ready():
 	rng.randomize()
 	noise.seed = rng.randi()
 	noise.octaves = octaves
-	# terrain = Terrain.new(width,height,spacing,false)
 	
 	var terrain_name="bonjourazeazea"
 	terrain = Terrain.new()
@@ -204,12 +203,3 @@ func add_trees():
 				var tree = treescene.instance()
 				tree.translation = Vector3(point.point3d() * Vector3(1, 24*5, 1))
 				add_child(tree)
-
-	# for point in points.size():
-	# 	if points_data[i].elevation > 0:
-	# 		var num = rng.randi_range(0, 20)
-	# 		if num == 2:
-	# 			var tree = treescene.instance()
-	# 			tree.translation = Vector3(points[i].x, points_data[i].elevation * terrace_height, points[i].y)
-
-	# 			add_child(tree)
