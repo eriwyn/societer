@@ -81,7 +81,14 @@ class Triangle:
 	func center3d():
 		var points = points()
 		return (points[0].point3d() + points[1].point3d() + points[2].point3d()) / 3.0
-		
+	
+	func set_elevation(elevation:float):
+		for point in points():
+			point.set_elevation(elevation)
+	
+	func get_elevation():
+		return center3d().y
+
 	func polygon():
 		var polygon = []
 		for point in points():
