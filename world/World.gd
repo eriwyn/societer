@@ -12,7 +12,7 @@ func draw_world():
 	var st = SurfaceTool.new()
 
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
-	st.add_smooth_group(true)
+	# st.add_smooth_group(true)
 	for triangle in terrain.get_triangles():
 		for point in triangle.points():
 			var factor = Vector3(1, 24*5, 1)

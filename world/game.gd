@@ -4,11 +4,11 @@ signal world_loaded
 
 export(int) var width = 2000
 export(int) var height = 2000
-export(int) var spacing = 5
+export(int) var spacing = 20
 export(int, 1, 9) var octaves = 5
 export(int, 1, 30) var wavelength = 8
 export(int) var border_width = 200
-export(int) var terraces = 24
+export(int) var terraces = 12
 export(int) var terrace_height = 5
 export(float) var mountain_height = 6.0 / 24.0
 export(int) var river_proba = 200
