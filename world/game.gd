@@ -59,7 +59,8 @@ func init_data():
 		if point.get_data("river"):
 			set_river_path(point)
 	for triangle in terrain.get_triangles():
-		triangle.set_data("elevation", triangle_find_elevation(triangle))
+		triangle.set_elevation(point_find_elevation(triangle.center2d()))
+		# triangle.set_data("elevation", triangle_find_elevation(triangle))
 		triangle.set_data("water", triangle_is_water(triangle))
 		triangle.set_data("ocean", false)
 		# TODO #1 : Get triangles around point
@@ -177,7 +178,7 @@ func triangle_find_elevation(triangle):
 	return elevation
 
 func triangle_is_water(triangle):
-	if triangle.get_data("elevation") <= 0:
+	if triangle.get_elevation() <= 0:
 		return true
 	return false
 

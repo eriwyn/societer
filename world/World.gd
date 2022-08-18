@@ -14,13 +14,13 @@ func draw_world():
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
 	# st.add_smooth_group(true)
 	for triangle in terrain.get_triangles():
-		for point in triangle.points():
-			var factor = Vector3(1, 24*5, 1)
+		# for point in triangle.points():
+		var factor = Vector3(1, 24*5, 1)
 			# if point.get_data("river") and i == 0:
 			# 	factor.y -= 0
 			# if i == 1:
 			# 	factor.y -= 2.0
-			st.add_vertex(point.point3d() * factor)
+		st.add_vertex(triangle.center3d() * factor)
 
 	st.generate_normals()
 	# st.generate_tangents()
