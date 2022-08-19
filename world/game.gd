@@ -59,7 +59,7 @@ func init_data():
 	# 	if point.get_data("river"):
 	# 		set_river_path(point)
 	for triangle in terrain.get_triangles():
-		triangle.set_elevation(point_find_elevation(triangle.center2d()))
+		triangle.set_elevation(find_elevation(triangle.center2d()))
 		# triangle.set_data("elevation", triangle_find_elevation(triangle))
 		triangle.set_data("water", triangle_is_water(triangle))
 		triangle.set_data("ocean", false)
@@ -119,7 +119,7 @@ func set_river_path(point):
 
 # Point
 
-func point_find_elevation(point):
+func find_elevation(point):
 
 	var border = border_width + rng.randf_range(-20.0, 20.0)
 	var elevation = noise.get_noise_2d(point.x / wavelength, point.y / wavelength)
