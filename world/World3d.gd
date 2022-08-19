@@ -46,6 +46,3 @@ func draw_world():
 func _on_Game_world_loaded(game_terrain):
 	terrain = game_terrain
 	draw_world()
-
-# 18 - 42
-# 4 - 9
