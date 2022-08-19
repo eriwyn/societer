@@ -8,7 +8,7 @@ export(int) var spacing = 20
 export(int, 1, 9) var octaves = 5
 export(int, 1, 30) var wavelength = 8
 export(int) var border_width = 200
-export(int) var terraces = 24
+export(int) var terraces = 10
 export(int) var terrace_height = 5
 export(float) var mountain_height = 6.0 / 24.0
 export(int) var river_proba = 200
@@ -22,9 +22,8 @@ func _ready():
 	rng.randomize()
 	noise.seed = rng.randi()
 	noise.octaves = octaves
-	# terrain = Terrain.new(width,height,spacing,false)
 	
-	var terrain_name="bonjour"
+	var terrain_name="bonjour90"
 	terrain = Terrain.new()
 
 	print(terrain.list())
@@ -44,26 +43,26 @@ func _ready():
 		Global.print_debug("Pas de palais ..., pas de palais.")
 
 func init_data():
-	for point in terrain.get_points():
-		point.set_elevation(point_find_elevation(point.point2d()))
-		point.set_data("water", point_is_water(point))
-		point.set_data("mountain", point_is_mountain(point))
+	# for point in terrain.get_points():
+		# point.set_elevation(point_find_elevation(point.point2d()))
+		# point.set_data("water", point_is_water(point))
+		# point.set_data("mountain", point_is_mountain(point))
 		# point.set_data("river", point_is_river(point))
 
-	fill_oceans()
+	# fill_oceans()
 	
-	for point in terrain.get_points():
-		if point.get_data("water") and not point.get_data("ocean"):
-			point.set_elevation(0.1)
-			point.set_data("water", false)
-		point.set_data("coast", point_is_coast(point))
-		if point.get_data("river"):
-			set_river_path(point)
+	# for point in terrain.get_points():
+	# 	if point.get_data("water") and not point.get_data("ocean"):
+	# 		point.set_elevation(0.1)
+	# 		point.set_data("water", false)
+	# 	point.set_data("coast", point_is_coast(point))
+	# 	if point.get_data("river"):
+	# 		set_river_path(point)
 	for triangle in terrain.get_triangles():
-		triangle.set_data("elevation", triangle_find_elevation(triangle))
+		triangle.set_elevation(find_elevation(triangle.center2d()))
+		# triangle.set_data("elevation", triangle_find_elevation(triangle))
 		triangle.set_data("water", triangle_is_water(triangle))
 		triangle.set_data("ocean", false)
-		# TODO #1 : Get triangles around point
 		for point in triangle.points():
 			if point.get_data("ocean"):
 				triangle.set_data("ocean", true)
@@ -120,7 +119,7 @@ func set_river_path(point):
 
 # Point
 
-func point_find_elevation(point):
+func find_elevation(point):
 
 	var border = border_width + rng.randf_range(-20.0, 20.0)
 	var elevation = noise.get_noise_2d(point.x / wavelength, point.y / wavelength)
@@ -178,7 +177,7 @@ func triangle_find_elevation(triangle):
 	return elevation
 
 func triangle_is_water(triangle):
-	if triangle.get_data("elevation") <= 0:
+	if triangle.get_elevation() < 0:
 		return true
 	return false
 
@@ -202,14 +201,5 @@ func add_trees():
 			var num = rng.randi_range(0, 5)
 			if num == 1:
 				var tree = treescene.instance()
-				tree.translation = Vector3(point.point3d() * Vector3(1, 24*5, 1))
+				tree.translation = Vector3(point.point3d() * Vector3(1, 12*10, 1))
 				add_child(tree)
-
-	# for point in points.size():
-	# 	if points_data[i].elevation > 0:
-	# 		var num = rng.randi_range(0, 20)
-	# 		if num == 2:
-	# 			var tree = treescene.instance()
-	# 			tree.translation = Vector3(points[i].x, points_data[i].elevation * terrace_height, points[i].y)
-
-	# 			add_child(tree)
