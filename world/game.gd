@@ -64,7 +64,6 @@ func init_data():
 		# triangle.set_data("elevation", triangle_find_elevation(triangle))
 		triangle.set_data("water", triangle_is_water(triangle))
 		triangle.set_data("ocean", false)
-		# TODO #1 : Get triangles around point
 		for point in triangle.points():
 			if point.get_data("ocean"):
 				triangle.set_data("ocean", true)

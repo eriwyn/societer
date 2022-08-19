@@ -10,9 +10,9 @@ func heightmap():
 		colors.add_point(0.999,  Color("#9e0142")) # red
 		colors.add_point(0.5,  Color("#dc865d")) # orange
 		colors.add_point(0.25,  Color("#fbf8b0")) # yellow
-		colors.add_point(0,  Color("#89cfa5")) # green
+		colors.add_point(0.0,  Color("#89cfa5")) # green
 		colors.add_point(-0.999,  Color("#5e4fa2")) # blue
-		var color = colors.interpolate(min(triangle.get_elevation(), 0.999))
+		var color = colors.interpolate(min(triangle.get_elevation()+0.001, 0.999))
 		if triangle.get_data("ocean"):
 			var factor = pow((triangle.get_elevation()+1), 10) / 5.0
 			color = Color("#5e4fa2") + Color(factor, factor, factor, 0.0)
