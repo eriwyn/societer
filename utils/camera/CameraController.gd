@@ -1,4 +1,4 @@
-extends Camera
+extends CameraOutline
 class_name CameraController
 
 signal camera_moved(new_location)
@@ -8,7 +8,7 @@ enum CAMERA_ACTIONS{
 	ROTATING_VIEW,
 }
 
-export(float,1,100) var movement_speed = 30
+export(float,1,100) var movement_speed = 48
 export(float,0.01,0.99) var movement_damping = 0.74
 export(float,0.01, 3.1415) var max_rotation = 1.2
 export(float,0.01, 3.1415) var min_rotation = 0.5
@@ -18,10 +18,10 @@ export(float,0.01, 3.1415) var min_rotation = 0.5
 export(float, 0.0,1.0) var edge_size = 0.0
 
 #EDIT HERE--->**,***<--- ZOOM MIN AND MAX LIMITS
-export(float, 10,100) var min_zoom = 25
+export(float, 10,100) var min_zoom = 10
 export(float, 10,100) var max_zoom = 100
 
-export(float, 1,3) var zoom_sensibility = 2.5
+export(float, 1,3) var zoom_sensibility = 1.4
 
 export(float, 1,3) var rotation_sensibility = 2.3
 export(float, 1.0, 10.0) var height = 5.0

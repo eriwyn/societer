@@ -38,14 +38,12 @@ environment = ExtResource( 3 )
 [node name="CamBase" parent="World3d" instance=ExtResource( 5 )]
 
 [node name="Camera" parent="World3d/CamBase" index="0"]
-transform = Transform( 1, 0, 0, 0, 0.910272, -0.41401, 0, 0.41401, 0.910272, 0, -1.90735e-06, 6.618 )
-movement_speed = 48.076
-min_zoom = 10.0
+transform = Transform( 1, 0, 0, 0, 0.659983, -0.75128, 0, 0.75128, 0.659983, 0, -1.90735e-06, 6.618 )
+fov = 55.0
 zoom_sensibility = 1.436
-rotation_sensibility = 3.0
 
 [node name="DirectionalLight" type="DirectionalLight" parent="World3d"]
-transform = Transform( 1, 0, 0, 0, 0.512597, 0.858629, 0, -0.858629, 0.512597, 0, 1.41623, 0 )
+transform = Transform( 1, 0, 0, 0, 0.641744, 0.766919, 0, -0.766919, 0.641744, 0, 1.41623, 0 )
 light_energy = 0.1
 shadow_enabled = true
 
