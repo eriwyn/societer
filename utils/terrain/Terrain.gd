@@ -63,7 +63,6 @@ class Triangle:
 		var list_points = []
 		for edge in edges():
 			list_points.append(Point.new(_terrain._triangles[edge._idx], _terrain))
-		list_points.invert()
 		return list_points
 		
 	func triangles_adjacent():
@@ -186,6 +185,12 @@ class Point:
 			if not (incoming_edge._idx != -1 and incoming_edge._idx != incoming):
 				break
 		return list_points
+		
+	func triangles_around():
+		var list_triangles = []
+		for edge in edges_around():
+			list_triangles.append(edge.triangle())
+		return list_triangles
 
 # Edges iterator
 class Edges:
@@ -283,42 +288,58 @@ var _triangles_data = []
 
 var _created = false
 var _loaded = false
+var _path = ""
 var _list = []
 
 # Terrain constructor
 func _init(width:int=1600, height:int=800, spacing:int=30, create=false, name:String=""):
-	var terrain_dir = Directory.new()
-	terrain_dir.open("user://")
-	if not terrain_dir.dir_exists("terrain"):
-		terrain_dir.make_dir("terrain")
-	terrain_dir.change_dir("terrain")
-	terrain_dir.list_dir_begin()
-	var filename = terrain_dir.get_next()
-	while filename != "":
-		if terrain_dir.file_exists(filename):
-			# Ok terrain file found
-			var terrain = {}
-			var terrain_filename = "user://terrain/%s" % (filename)
-			var file = File.new()
-			file.open(terrain_filename, File.READ)
-			terrain["width"] = file.get_var()
-			terrain["height"] = file.get_var()
-			terrain["spacing"] = file.get_var()
-			terrain["name"] = file.get_var()
-			file.close()
-			_list.append(terrain)
-		filename = terrain_dir.get_next()
-	terrain_dir.list_dir_end()
-	
+	var directory = Directory.new()
 	var file = File.new()
-	var terrain_filename = "user://terrain/terrain_%s.save" % (name)
-	if file.file_exists(terrain_filename) and not create:
+	var file_name = ""
+	var directory_name = ""
+	var path = ""
+	var parameter = {}
+	var parameter_file_name = ""
+	var graph_file_name = ""
+	var data_file_name = ""
+	
+	# Get list terrain
+	directory.open("user://")
+	if not directory.dir_exists("terrain"):
+		directory.make_dir("terrain")
+	directory.change_dir("terrain")
+	directory.list_dir_begin()
+	directory_name = directory.get_next()
+	while directory_name != "":
+		if directory.dir_exists(directory_name):
+			# Ok terrain path found
+			path = "user://terrain/%s" % (directory_name)
+			
+			# Get terrain parameters
+			file_name = "%s/param.save" % path
+			if file.file_exists(file_name):
+				parameter = {}
+				file.open(file_name, File.READ)
+				parameter["width"] = file.get_var()
+				parameter["height"] = file.get_var()
+				parameter["spacing"] = file.get_var()
+				parameter["name"] = file.get_var()
+				file.close()
+				_list.append(parameter)
+		directory_name = directory.get_next()
+	directory.list_dir_end()
+	
+	# Create or Load Terrain
+	_path = "user://terrain/%s" % (name)
+	parameter_file_name = "%s/param.save" % (_path)
+	graph_file_name = "%s/graph.save" % (_path)
+	data_file_name = "%s/data.save" % (_path)
+	if directory.open(_path) == OK and file.file_exists(parameter_file_name) and file.file_exists(graph_file_name) and file.file_exists(data_file_name) and not create:
 		Global.print_debug("loading : %s ..." % (name))
 		load(name)
 	else:
 		if name:
 			create(width, height, spacing, name)
-
 		
 func create(width:int, height:int, spacing:int, name:String):
 	Global.print_debug("Creating : %s ..." % (name))
@@ -387,23 +408,50 @@ func get_triangle(idx):
 	return Triangle.new(idx, self)
 	
 func save():
-	var terrain_dir = Directory.new()
+	var directory = Directory.new()
+	Global.print_debug("Save terrain : %s" %(_name))
+	
+	# Goto terrain directory
+	directory.open("user://")
+	if not directory.dir_exists("terrain"):
+		directory.make_dir("terrain")
+	directory.change_dir("terrain")
+	if not directory.dir_exists(_name):
+		directory.make_dir(_name)
+	directory.change_dir(_name)
+	
+	# Save terrain
+	save_parameter()
+	save_graph()
+	save_data()
+
+func save_parameter():
 	var file = File.new()
-	var terrain_filename = "user://terrain/terrain_%s.save" % (_name)
-	terrain_dir.open("user://")
-	if not terrain_dir.dir_exists("terrain"):
-		terrain_dir.make_dir("terrain")
-	terrain_dir.change_dir("terrain")
-	Global.print_debug("Save file : %s" % (terrain_filename))
-	file.open(terrain_filename, File.WRITE)
+	var file_name = "user://terrain/%s/param.save" % (_name)
+	Global.print_debug("Save parameter terrain : %s" % (_name))
+	file.open(file_name, File.WRITE)
 	file.store_var(_width)
 	file.store_var(_height)
 	file.store_var(_spacing)
 	file.store_var(_name)
+	file.close()
+	
+func save_graph():
+	var file = File.new()
+	var file_name = "user://terrain/%s/graph.save" % (_name)
+	Global.print_debug("Save graph terrain : %s" % (_name))
+	file.open(file_name, File.WRITE)
 	file.store_var(_points)
 	file.store_var(_halfedges)
 	file.store_var(_triangles)
 	file.store_var(_points_to_halfedges)
+	file.close()
+	
+func save_data():
+	var file = File.new()
+	var file_name = "user://terrain/%s/data.save" % (_name)
+	Global.print_debug("Save data terrain : %s" % (_name))
+	file.open(file_name, File.WRITE)
 	file.store_var(_data)
 	file.store_var(_points_data)
 	file.store_var(_edges_data)
@@ -411,31 +459,71 @@ func save():
 	file.close()
 	
 func load(name):
-	var terrain_dir = Directory.new()
+	# Goto terrain directory
+	var directory = Directory.new()
+	directory.open("user://")
+	if not directory.dir_exists("terrain"):
+		directory.make_dir("terrain")
+	directory.change_dir("terrain")
+	if not directory.dir_exists(name):
+		directory.make_dir(name)
+	directory.change_dir(name)
+	
+	# Load parameter
+	if directory.file_exists("param.save"):
+		load_parameter(name)
+		
+	# Load graph
+	if directory.file_exists("graph.save"):
+		load_graph(name)
+		
+	# Load data
+	if directory.file_exists("data.save"):
+		load_data(name)
+		
+	_loaded = true
+
+func load_parameter(name):
 	var file = File.new()
-	var terrain_filename = "user://terrain/terrain_%s.save" % (name)
-	terrain_dir.open("user://")
-	if not terrain_dir.dir_exists("terrain"):
-		terrain_dir.make_dir("terrain")
-	if terrain_dir.file_exists(terrain_filename):
-		Global.print_debug("Load file : %s" % (terrain_filename))
-		file.open(terrain_filename, File.READ)
+	var file_name = "user://terrain/%s/param.save" % (name)
+	Global.print_debug("Load parameter file : %s" % (file_name))
+	if file.file_exists(file_name):
+		file.open(file_name, File.READ)
 		_width = file.get_var()
 		_height = file.get_var()
 		_spacing = file.get_var()
 		_name = file.get_var()
+		file.close()
+	else:
+		Global.print_debug("The parameter file : %s does not exist" % (file_name))
+		
+func load_graph(name):
+	var file = File.new()
+	var file_name = "user://terrain/%s/graph.save" % (name)
+	Global.print_debug("Load graph file : %s" % (file_name))
+	if file.file_exists(file_name):
+		file.open(file_name, File.READ)
 		_points = file.get_var()
 		_halfedges = file.get_var()
 		_triangles = file.get_var()
 		_points_to_halfedges = file.get_var()
+		file.close()
+	else:
+		Global.print_debug("The graph file : %s does not exist" % (file_name))
+		
+func load_data(name):
+	var file = File.new()
+	var file_name = "user://terrain/%s/data.save" % (name)
+	Global.print_debug("Load data file : %s" % (file_name))
+	if file.file_exists(file_name):
+		file.open(file_name, File.READ)
 		_data = file.get_var()
 		_points_data = file.get_var()
 		_edges_data = file.get_var()
 		_triangles_data = file.get_var()
 		file.close()
-		_loaded = true
 	else:
-		Global.print_debug("The file : %s does not exist" % (terrain_filename))
+		Global.print_debug("The data file : %s does not exist" % (file_name))
 	
 func list():
 	return _list
