@@ -178,6 +178,12 @@ class Point:
 			if not (incoming_edge._idx != -1 and incoming_edge._idx != incoming):
 				break
 		return list_points
+		
+	func triangles_around():
+		var list_triangles = []
+		for edge in edges_around():
+			list_triangles.append(edge.triangle())
+		return list_triangles
 
 # Edges iterator
 class Edges:
