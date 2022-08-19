@@ -3,6 +3,140 @@ extends Reference
 # Build terrain from delaunay graph
 class_name Terrain
 
+# Voronoi Center iterator
+class VoronoiCenters:
+	var _terrain
+	var _curr
+	var _end
+	
+	func _init(terrain):
+		self._terrain = terrain
+		self._curr = 0
+		self._end = _terrain._points.size()
+		
+	func _should_continue():
+		return (_curr < _end)
+		
+	func _iter_init(_arg):
+		_curr = 0
+		return _should_continue()
+		
+	func _iter_next(_arg):
+		_curr += 1
+		return _should_continue()
+		
+	func _iter_get(_arg):
+		var point = Point.new(_curr,_terrain)
+		return point
+		
+	func size():
+		return _end
+
+# Voronoi Center object
+class VoronoiCenter:
+	var _idx
+	var _terrain
+	
+	func _init(idx, terrain):
+		self._idx = idx
+		self._terrain = terrain
+
+	func to_point():
+		return Point.new(_idx, _terrain)
+		
+	func get_index():
+		return _idx
+
+	func has_key(key):
+		return _terrain._points_data[_idx].has(key)
+				
+	func set_data(key,value):
+		var data = _terrain._points_data[_idx]
+		data[key] = value
+		
+	func get_data(key):
+		var data = _terrain._points_data[_idx]
+		if data.has(key):
+			return data[key]
+		
+	func point3d():
+		return _terrain._points[_idx]
+		
+	func point2d():
+		var point3d:Vector3 = _terrain._points[_idx]
+		var point2d:Vector2 = Vector2(point3d.x, point3d.z)
+		return(point2d)
+		
+	func set_elevation(elevation:float):
+		_terrain._points[_idx].y = elevation
+		
+	func get_elevation():
+		return(_terrain._points[_idx].y)
+
+	func neighbors():
+		var list_centers = []
+		
+		for point in to_point().points_around():
+			list_centers.append(point.to_center())
+		return list_centers
+		
+	func borders():
+		var list_edges = []
+		for edge in to_point().edges_around():
+			var center_start = edge.start().to_center()
+			var center_end = edge.end().to_center()
+			var corner_start = VoronoiCorner.new(edge.triangle())
+			var corner_end = VoronoiCorner.new(edge.opposite().triangle())
+			list_edges.append(VoronoiEdge.new(corner_start,corner_end,center_start,center_end))
+		return list_edges
+			
+	
+	func corners():
+		var list_corners = []
+		
+		for triangle in to_point().triangles_around():
+			var corner = VoronoiCorner.new(triangle)
+			list_corners.append(corner)
+		return list_corners
+
+# Voronoi Corner object
+class VoronoiCorner:
+	var _triangle
+
+	func _init(triangle):
+		self._triangle = triangle
+			
+	func point3d():
+		return _triangle.center3d()
+		
+	func point2d():
+		return _triangle.center2d()
+
+# Voronoi Edge object
+class VoronoiEdge:
+	var _start_corner
+	var _end_corner
+	var _start_center
+	var _end_center
+		
+	func _init(start_corner, end_corner, start_center, end_center):
+		self._start_corner = end_corner
+		self._end_corner = start_corner
+		self._start_center = end_center
+		self._end_center = start_center
+		
+	func start_corner():
+		return _start_corner
+		
+	func end_corner():
+		return _end_corner
+		
+	func start_center():
+		return _start_center
+		
+	func end_center():
+		return _end_center
+
 # Triangles iterator
 class Triangles:
 	var _terrain
@@ -124,6 +258,9 @@ class Point:
 	func _init(idx, terrain):
 		self._idx = idx
 		self._terrain = terrain
+
+	func to_center():
+		return VoronoiCenter.new(_idx, _terrain)
 		
 	func get_index():
 		return _idx
@@ -390,6 +527,9 @@ func get_points():
 	
 func get_point(idx):
 	return Point.new(idx, self)
+	
+func get_center(idx):
+	return VoronoiCenter.new(idx, self)
 	
 func get_edge(idx):
 	return Edge.new(idx, self)
