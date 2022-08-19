@@ -24,7 +24,7 @@ func _ready():
 	noise.octaves = octaves
 	# terrain = Terrain.new(width,height,spacing,false)
 	
-	var terrain_name="bonjourazeazea"
+	var terrain_name="bonjour"
 	terrain = Terrain.new()
 
 	print(terrain.list())
@@ -32,7 +32,7 @@ func _ready():
 	if terrain.exists(terrain_name):
 		terrain.load(terrain_name)
 	else:
-		terrain.create(width,height,spacing,"bonjour")
+		terrain.create(width,height,spacing,terrain_name)
 
 	if terrain.is_created() or terrain.is_loaded():
 		init_data()
