@@ -4,7 +4,7 @@ signal world_loaded
 
 export(int) var width = 2000
 export(int) var height = 2000
-export(int) var spacing = 5
+export(int) var spacing = 20
 export(int, 1, 9) var octaves = 5
 export(int, 1, 30) var wavelength = 8
 export(int) var border_width = 200
