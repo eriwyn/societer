@@ -63,6 +63,7 @@ class Triangle:
 		var list_points = []
 		for edge in edges():
 			list_points.append(Point.new(_terrain._triangles[edge._idx], _terrain))
+		list_points.invert()
 		return list_points
 		
 	func triangles_adjacent():
