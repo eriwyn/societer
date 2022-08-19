@@ -42,7 +42,6 @@ func draw_world():
 	mi.cast_shadow = GeometryInstance.SHADOW_CASTING_SETTING_ON
 	print(mi)
 	add_child(mi)
-	Global.print_debug(OS.get_ticks_msec() / 1000.0)
 
 func _on_Game_world_loaded(game_terrain):
 	terrain = game_terrain
