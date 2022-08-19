@@ -43,7 +43,7 @@ fov = 55.0
 zoom_sensibility = 1.436
 
 [node name="DirectionalLight" type="DirectionalLight" parent="World3d"]
-transform = Transform( 1, 0, 0, 0, 0.641744, 0.766919, 0, -0.766919, 0.641744, 0, 1.41623, 0 )
+transform = Transform( 0.971628, 0.168947, -0.16552, 0, 0.699825, 0.714314, 0.236516, -0.694047, 0.67997, 0, 1.41623, 14.8745 )
 light_energy = 0.1
 shadow_enabled = true
 

@@ -23,7 +23,7 @@ func _ready():
 	noise.seed = rng.randi()
 	noise.octaves = octaves
 	
-	var terrain_name="bonjour"
+	var terrain_name="bonjour90"
 	terrain = Terrain.new()
 
 	print(terrain.list())
@@ -36,6 +36,7 @@ func _ready():
 	if terrain.is_created() or terrain.is_loaded():
 		init_data()
 		add_trees()
+		Global.print_debug(OS.get_ticks_msec() / 1000.0)
 		emit_signal("world_loaded", terrain)
 	else:
 		Global.print_debug("Pas de terrain, pas de construction ...")
@@ -178,7 +179,7 @@ func triangle_find_elevation(triangle):
 	return elevation
 
 func triangle_is_water(triangle):
-	if triangle.get_elevation() <= 0:
+	if triangle.get_elevation() < 0:
 		return true
 	return false
 
