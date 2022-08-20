@@ -9,6 +9,7 @@ enum CAMERA_ACTIONS{
 }
 
 export(float,1,100) var movement_speed = 48
+export(float, 100, 10000) var up_speed = 800
 export(float,0.01,0.99) var movement_damping = 0.74
 export(float,0.01, 3.1415) var max_rotation = 1.2
 export(float,0.01, 3.1415) var min_rotation = 0.5
@@ -24,12 +25,12 @@ export(float, 10,100) var max_zoom = 100
 export(float, 1,3) var zoom_sensibility = 1.4
 
 export(float, 1,3) var rotation_sensibility = 2.3
-export(float, 1.0, 10.0) var height = 5.0
+export(float, 1.0, 10.0) var height = 15.0
 
 var pitch : float
 var yaw : float
 var current_action = CAMERA_ACTIONS.MOVING
-var velocity : Vector2
+var velocity : Vector3
 
 func _ready():
 #	Input.set_mouse_mode(Input.MOUSE_MODE_CONFINED)
@@ -55,31 +56,41 @@ func _process(delta):
 		CAMERA_ACTIONS.MOVING:
 			#CAMERA MOVEMENT
 			velocity.x = clamp(velocity.x * movement_damping,-1.0,1.0)
-			velocity.y = clamp(velocity.y * movement_damping,-1.0,1.0)
+			velocity.z = clamp(velocity.z * movement_damping,-1.0,1.0)
 			
-			if velocity != Vector2.ZERO:
+			# get velocity y giver the height of the floor
+			var space_state = get_world().direct_space_state
+			var result = space_state.intersect_ray(Vector3(global_transform.origin.x, 100, global_transform.origin.z), Vector3(global_transform.origin.x, 0, global_transform.origin.z))
+			if result:
+				var direction = 0
+				var difference = global_transform.origin.y - height - result.position.y
+				var vertical = range_lerp(abs(difference),0, 24*5,0.0,1.0)
+				if result.position.y > global_transform.origin.y - height:
+					direction = 1
+				elif result.position.y < global_transform.origin.y - height:
+					direction = -1
+				velocity.y = vertical * direction
+
+			velocity.y = clamp(velocity.y * movement_damping,-1.0,1.0)
+
+			if velocity != Vector3.ZERO:
 				move(velocity)
 
 
 func change_velocity(_velocity : Vector2):
-	velocity = _velocity
+	velocity.x = _velocity.x
+	velocity.z = _velocity.y
 	
-func move(_velocity : Vector2):
+func move(_velocity : Vector3):
 	#Move along cameras X axis
 	global_transform.origin += global_transform.basis.x * velocity.x * movement_speed * get_process_delta_time()
+	#Move along camera Y axis
+	global_transform.origin += global_transform.basis.z * velocity.y * up_speed * get_process_delta_time()
 	#Calculate a forward camera direction that is perpendicular to the XZ plane
 	var forward = global_transform.basis.x.cross(Vector3.UP)
 	#Move the camera along that forward direction
-	global_transform.origin += forward * velocity.y * movement_speed * get_process_delta_time()
-	
-	var y_offset = 0
-	var space_state = get_world().direct_space_state
-	var result = space_state.intersect_ray(Vector3(global_transform.origin.x, 100, global_transform.origin.z), Vector3(global_transform.origin.x, 0, global_transform.origin.z))
-	if result:
-		y_offset = result.position.y
-	else:
-		y_offset = 0
-	global_transform.origin.y = max(15 + y_offset * 1.3, 10)
+	global_transform.origin += forward * velocity.z * movement_speed * get_process_delta_time()
+
 
 	emit_signal("camera_moved", global_transform.origin)
 
@@ -109,11 +120,10 @@ func rotate_view(axis : Vector2):
 	rotation.x = pitch
 	rotation.y = yaw
 
-func _on_Map_map_clicked(position):
+func teleport(position):
 	global_transform.origin.x = position.x
 	global_transform.origin.z = position.y
-	
-	
+
 	var y_offset = 0
 	var space_state = get_world().direct_space_state
 	var result = space_state.intersect_ray(Vector3(global_transform.origin.x, 100, global_transform.origin.z), Vector3(global_transform.origin.x, 0, global_transform.origin.z))
@@ -121,21 +131,12 @@ func _on_Map_map_clicked(position):
 		y_offset = result.position.y
 	else:
 		y_offset = 0
-	global_transform.origin.y = max(height + y_offset * 1.3, 30)
-	pass # Replace with function body.
+	global_transform.origin.y = height + y_offset
+
+func _on_Map_map_clicked(position):
+	teleport(position)
 
 
 func _on_World_character_created(position):
-	global_transform.origin.x = position.x
-	global_transform.origin.z = position.y
+	teleport(position)
 	
-	
-	var y_offset = 0
-	var space_state = get_world().direct_space_state
-	var result = space_state.intersect_ray(Vector3(global_transform.origin.x, 100, global_transform.origin.z), Vector3(global_transform.origin.x, 0, global_transform.origin.z))
-	if result:
-		y_offset = result.position.y
-	else:
-		y_offset = 0
-	global_transform.origin.y = max(height + y_offset * 1.3, 30)
-	pass # Replace with function body.
