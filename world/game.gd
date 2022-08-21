@@ -29,10 +29,9 @@ func _ready():
 
 	if Global.terrain.is_created():
 		init_data()
-		Global.terrain.save_data()
+		Global.terrain.save()
 
 	if Global.terrain.is_created() or Global.terrain.is_loaded():
-		Global.terrain.load_data(Global.terrain_name)
 		add_trees()
 		emit_signal("world_loaded")
 	else:
