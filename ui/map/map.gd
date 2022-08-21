@@ -3,6 +3,7 @@ extends Node2D
 signal map_clicked
 
 func heightmap():
+	print (Global.terrain)
 	for triangle in Global.terrain.get_triangles():
 		var colors = Gradient.new()
 		colors.add_point(0.999,  Color("#9e0142")) # red
@@ -97,6 +98,3 @@ func _process(_delta):
 		var new_position = get_viewport().get_mouse_position() / scale
 		if new_position.x <= 2000 and new_position.y <= 2000:
 			emit_signal("map_clicked", new_position)
-
-func _on_Game_world_loaded():
-	update()

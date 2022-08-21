@@ -1,8 +1,7 @@
 extends Spatial
 
 func _ready():
-	pass
-
+	draw_world()
 
 func draw_world():
 	# for i in range(0, 1, 1):
@@ -43,6 +42,3 @@ func draw_world():
 	mi.cast_shadow = GeometryInstance.SHADOW_CASTING_SETTING_ON
 	print(mi)
 	add_child(mi)
-
-func _on_Game_world_loaded():
-	draw_world()

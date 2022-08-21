@@ -1,7 +1,6 @@
-[gd_scene load_steps=8 format=2]
+[gd_scene load_steps=7 format=2]
 
 [ext_resource path="res://ui/ui.tscn" type="PackedScene" id=1]
-[ext_resource path="res://world/game.gd" type="Script" id=2]
 [ext_resource path="res://world/default_env.tres" type="Environment" id=3]
 [ext_resource path="res://world/World3d.gd" type="Script" id=4]
 [ext_resource path="res://utils/camera/CamBase.tscn" type="PackedScene" id=5]
@@ -13,7 +12,6 @@ size = Vector2( 2000, 2000 )
 albedo_color = Color( 0.054902, 0.533333, 0.741176, 1 )
 
 [node name="Game" type="Node"]
-script = ExtResource( 2 )
 
 [node name="UI" parent="." instance=ExtResource( 1 )]
 
@@ -47,8 +45,6 @@ transform = Transform( 0.971628, 0.168947, -0.16552, 0, 0.699825, 0.714314, 0.23
 light_energy = 0.1
 shadow_enabled = true
 
-[connection signal="world_loaded" from="." to="UI/Map" method="_on_Game_world_loaded"]
-[connection signal="world_loaded" from="." to="World3d" method="_on_Game_world_loaded"]
 [connection signal="map_clicked" from="UI/Map" to="World3d/CamBase/Camera" method="_on_Map_map_clicked"]
 [connection signal="camera_moved" from="World3d/CamBase/Camera" to="UI/Map/Cursor" method="_on_Camera_camera_moved"]
 

@@ -1,6 +1,4 @@
-extends Node
-
-signal world_loaded
+extends Control
 
 export(int) var width = 2000
 export(int) var height = 2000
@@ -33,7 +31,7 @@ func _ready():
 
 	if Global.terrain.is_created() or Global.terrain.is_loaded():
 		add_trees()
-		emit_signal("world_loaded")
+		get_tree().change_scene("res://world/game.tscn")
 	else:
 		Global.print_debug("Pas de Global.terrain, pas de construction ...")
 		Global.print_debug("Pas de construction ..., pas de palais ...")
