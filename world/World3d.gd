@@ -1,7 +1,5 @@
 extends Spatial
 
-var terrain
-
 func _ready():
 	pass
 
@@ -13,7 +11,7 @@ func draw_world():
 
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
 	# st.add_smooth_group(true)
-	for triangle in terrain.get_triangles():
+	for triangle in Global.terrain.get_triangles():
 		if not triangle.is_water():
 			if triangle.get_elevation() < 0:
 				print(triangle.get_elevation())
@@ -46,6 +44,5 @@ func draw_world():
 	print(mi)
 	add_child(mi)
 
-func _on_Game_world_loaded(game_terrain):
-	terrain = game_terrain
+func _on_Game_world_loaded():
 	draw_world()
