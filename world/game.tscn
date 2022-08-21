@@ -28,7 +28,7 @@ z_index = 3
 script = ExtResource( 4 )
 
 [node name="Water" type="MeshInstance" parent="World3d"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 1000, -0.5, 1000 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 1000, 0, 1000 )
 mesh = SubResource( 1 )
 material/0 = SubResource( 2 )
 

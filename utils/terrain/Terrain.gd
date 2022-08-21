@@ -95,6 +95,11 @@ class Triangle:
 			polygon.append(point.point2d())
 		return polygon
 
+	func is_water():
+		if get_elevation() <= 0:
+			return true
+		return false
+
 # Points iterator		
 class Points:
 	var _terrain

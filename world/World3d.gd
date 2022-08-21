@@ -14,19 +14,22 @@ func draw_world():
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
 	# st.add_smooth_group(true)
 	for triangle in terrain.get_triangles():
-		var factor = Vector3(1, 12*10, 1)
-		for edge in triangle.edges():
-			if triangle.get_elevation() > edge.opposite_triangle().get_elevation():
-				st.add_vertex(Vector3(edge.start().point3d().x, triangle.get_elevation(), edge.start().point3d().z) * factor)
-				st.add_vertex(Vector3(edge.end().point3d().x, triangle.get_elevation(), edge.end().point3d().z) * factor)
-				st.add_vertex(Vector3(edge.start().point3d().x, edge.opposite_triangle().get_elevation(), edge.start().point3d().z) * factor)
-				
-				st.add_vertex(Vector3(edge.end().point3d().x, triangle.get_elevation(), edge.end().point3d().z) * factor)
-				st.add_vertex(Vector3(edge.end().point3d().x, edge.opposite_triangle().get_elevation(), edge.end().point3d().z) * factor)
-				st.add_vertex(Vector3(edge.start().point3d().x, edge.opposite_triangle().get_elevation(), edge.start().point3d().z) * factor)
+		if not triangle.is_water():
+			if triangle.get_elevation() < 0:
+				print(triangle.get_elevation())
+			var factor = Vector3(1, 120, 1)
+			for edge in triangle.edges():
+				if triangle.get_elevation() > edge.opposite_triangle().get_elevation():
+					st.add_vertex(Vector3(edge.start().point3d().x, triangle.get_elevation(), edge.start().point3d().z) * factor)
+					st.add_vertex(Vector3(edge.end().point3d().x, triangle.get_elevation(), edge.end().point3d().z) * factor)
+					st.add_vertex(Vector3(edge.start().point3d().x, edge.opposite_triangle().get_elevation(), edge.start().point3d().z) * factor)
 					
-		for point in triangle.points():
-			st.add_vertex(Vector3(point.point3d().x, triangle.get_elevation(), point.point3d().z) * factor)
+					st.add_vertex(Vector3(edge.end().point3d().x, triangle.get_elevation(), edge.end().point3d().z) * factor)
+					st.add_vertex(Vector3(edge.end().point3d().x, edge.opposite_triangle().get_elevation(), edge.end().point3d().z) * factor)
+					st.add_vertex(Vector3(edge.start().point3d().x, edge.opposite_triangle().get_elevation(), edge.start().point3d().z) * factor)
+						
+			for point in triangle.points():
+				st.add_vertex(Vector3(point.point3d().x, triangle.get_elevation(), point.point3d().z) * factor)
 
 	st.generate_normals()
 #	st.generate_tangents()

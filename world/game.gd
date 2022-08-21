@@ -58,18 +58,25 @@ func init_data():
 	# 	point.set_data("coast", point_is_coast(point))
 	# 	if point.get_data("river"):
 	# 		set_river_path(point)
+	var triangles = 0
 	for triangle in terrain.get_triangles():
+		triangles += 1
 		triangle.set_elevation(find_elevation(triangle.center2d()))
 		# triangle.set_data("elevation", triangle_find_elevation(triangle))
 		triangle.set_data("water", triangle_is_water(triangle))
-		triangle.set_data("ocean", false)
-		for point in triangle.points():
-			if point.get_data("ocean"):
-				triangle.set_data("ocean", true)
-	for edge in terrain.get_edges():
-		edge.set_data("coast", edge_is_coast(edge))
-		edge.set_data("river", edge_is_river(edge))
-
+		if not triangle.get_data("water"):
+			if triangle.get_elevation() < 0:
+				print(triangle.get_elevation())
+		if triangle.is_water():
+			triangle.set_elevation(0)
+	# 	triangle.set_data("ocean", false)
+	# 	for point in triangle.points():
+	# 		if point.get_data("ocean"):
+	# 			triangle.set_data("ocean", true)
+	# for edge in terrain.get_edges():
+	# 	edge.set_data("coast", edge_is_coast(edge))
+	# 	edge.set_data("river", edge_is_river(edge))
+	print(triangles)
 func fill_oceans():
 	var stack = []
 	for point in terrain.get_points():
@@ -115,23 +122,24 @@ func set_river_path(point):
 	path.append(point.get_index())
 	for index in path:
 		terrain.get_point(index).set_data("river", true)
-		terrain.get_point(index).set_data("water", true)
+		# terrain.get_point(index).set_data("water", true)
 
 # Point
 
 func find_elevation(point):
 
-	var border = border_width + rng.randf_range(-20.0, 20.0)
+	# var border = border_width + rng.randf_range(-20.0, 20.0)
 	var elevation = noise.get_noise_2d(point.x / wavelength, point.y / wavelength)
 	
-	if point.x < border:
-		elevation -= ((border - point.x) / border) / 2.0
-	if point.y < border:
-		elevation -= (border - point.y) / border
-	if point.x > width - border:
-		elevation -= (border - (width - point.x)) / border
-	if point.y > height - border:
-		elevation -= (border - (height - point.y)) / border
+	var nx = 2 * point.x / width - 1
+	var ny = 2 * point.y / height - 1
+
+	var radius = range_lerp(elevation, -1, 1, 0.8, 1.0)
+
+	var distance = 1 - (1-pow(nx, 2)) * (1-pow(ny,2))
+	distance = sqrt(pow(nx, 2) + pow(ny, 2))
+	if distance > radius:
+		elevation = (elevation - range_lerp(distance, radius, 1.0, 0.0, 1.0))
 		
 	elevation = max(elevation, -1)
 			
@@ -144,7 +152,7 @@ func find_elevation(point):
 	return elevation
 	
 func point_is_water(point):
-	if (point.get_elevation() <= 0):
+	if (point.get_elevation() < 0):
 		return true
 	return false
 
@@ -177,7 +185,7 @@ func triangle_find_elevation(triangle):
 	return elevation
 
 func triangle_is_water(triangle):
-	if triangle.get_elevation() < 0:
+	if triangle.get_elevation() <= 0.0:
 		return true
 	return false
 
@@ -196,10 +204,10 @@ func edge_is_river(edge):
 func add_trees():
 	rng.randomize()
 	var treescene = load("res://entities/environment/birchtree/birchtree.tscn")
-	for point in terrain.get_points():
-		if not point.get_data("water"):
+	for triangle in terrain.get_triangles():
+		if not triangle.get_data("water"):
 			var num = rng.randi_range(0, 5)
 			if num == 1:
 				var tree = treescene.instance()
-				tree.translation = Vector3(point.point3d() * Vector3(1, 12*10, 1))
+				tree.translation = Vector3(triangle.center3d() * Vector3(1, 12*10, 1))
 				add_child(tree)
