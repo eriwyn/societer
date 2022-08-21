@@ -6,11 +6,11 @@ func _ready():
 
 
 func _on_NewButton_pressed():
-	get_tree().change_scene("res://world/game.tscn")
+	get_tree().change_scene("res://menu/NewWorld.tscn")
 
 
 func _on_LoadButton_pressed():
-	pass # Replace with function body.
+	get_tree().change_scene("res://menu/LoadWorld.tscn")
 
 
 func _on_QuitButton_pressed():

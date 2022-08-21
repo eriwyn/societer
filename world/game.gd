@@ -23,18 +23,23 @@ func _ready():
 	noise.seed = rng.randi()
 	noise.octaves = octaves
 	
-	var terrain_name="bonjour90"
-	terrain = Terrain.new()
+	# var Global.terrain_name="bonjour90"
+	terrain = Global.terrain
 
 	print(terrain.list())
 	
-	if terrain.exists(terrain_name):
-		terrain.load(terrain_name)
+	if terrain.exists(Global.terrain_name):
+		terrain.load(Global.terrain_name)
 	else:
-		terrain.create(width,height,spacing,terrain_name)
+		terrain.create(width,height,spacing,Global.terrain_name)
+		
+
+	if terrain.is_created():
+		init_data()
+		terrain.save_data()
 
 	if terrain.is_created() or terrain.is_loaded():
-		init_data()
+		
 		add_trees()
 		emit_signal("world_loaded", terrain)
 	else:
@@ -58,9 +63,7 @@ func init_data():
 	# 	point.set_data("coast", point_is_coast(point))
 	# 	if point.get_data("river"):
 	# 		set_river_path(point)
-	var triangles = 0
 	for triangle in terrain.get_triangles():
-		triangles += 1
 		triangle.set_elevation(find_elevation(triangle.center2d()))
 		# triangle.set_data("elevation", triangle_find_elevation(triangle))
 		triangle.set_data("water", triangle_is_water(triangle))
@@ -76,7 +79,7 @@ func init_data():
 	# for edge in terrain.get_edges():
 	# 	edge.set_data("coast", edge_is_coast(edge))
 	# 	edge.set_data("river", edge_is_river(edge))
-	print(triangles)
+
 func fill_oceans():
 	var stack = []
 	for point in terrain.get_points():

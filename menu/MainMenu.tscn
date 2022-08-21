@@ -21,26 +21,31 @@ margin_top = -74.5
 margin_right = 158.0
 margin_bottom = 74.5
 
-[node name="NewButton" type="Button" parent="VBoxContainer"]
+[node name="Title" type="Label" parent="VBoxContainer"]
 margin_right = 316.0
-margin_bottom = 47.0
+margin_bottom = 131.0
+text = "Societer
+"
+align = 1
+
+[node name="NewButton" type="Button" parent="VBoxContainer"]
+margin_top = 135.0
+margin_right = 316.0
+margin_bottom = 176.0
 theme = SubResource( 1 )
 text = "Nouveau monde"
-flat = true
 
 [node name="LoadButton" type="Button" parent="VBoxContainer"]
-margin_top = 51.0
+margin_top = 180.0
 margin_right = 316.0
-margin_bottom = 98.0
+margin_bottom = 221.0
 text = "Charger un monde"
-flat = true
 
 [node name="QuitButton" type="Button" parent="VBoxContainer"]
-margin_top = 102.0
+margin_top = 225.0
 margin_right = 316.0
-margin_bottom = 149.0
+margin_bottom = 266.0
 text = "Quitter"
-flat = true
 
 [connection signal="pressed" from="VBoxContainer/NewButton" to="." method="_on_NewButton_pressed"]
 [connection signal="pressed" from="VBoxContainer/LoadButton" to="." method="_on_LoadButton_pressed"]

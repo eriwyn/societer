@@ -1,7 +1,8 @@
 extends Node
 
 var debug = true
-var terrain
+var terrain_name = ""
+var terrain = Terrain.new()
 
 # Debuging messages
 func print_debug(message):
