@@ -45,7 +45,7 @@ _global_script_class_icons={
 [application]
 
 config/name="Societer"
-run/main_scene="res://world/game.tscn"
+run/main_scene="res://menu/MainMenu.tscn"
 config/icon="res://icon.png"
 
 [autoload]

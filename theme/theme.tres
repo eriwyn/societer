@@ -1,0 +1,12 @@
+[gd_resource type="Theme" load_steps=3 format=2]
+
+[sub_resource type="DynamicFontData" id=1]
+font_path = "res://theme/fonts/monogram.ttf"
+
+[sub_resource type="DynamicFont" id=2]
+size = 50
+font_data = SubResource( 1 )
+
+[resource]
+Button/colors/font_color_hover = Color( 0.819608, 0.211765, 0.211765, 1 )
+Button/fonts/font = SubResource( 2 )
