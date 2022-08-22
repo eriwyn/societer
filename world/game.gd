@@ -23,7 +23,8 @@ func _ready():
 	noise.seed = rng.randi()
 	noise.octaves = octaves
 	
-	var terrain_name="bonjour90"
+	var terrain_name="bonjour01"
+
 	terrain = Terrain.new()
 
 	print(terrain.list())
@@ -34,6 +35,30 @@ func _ready():
 		terrain.create(width,height,spacing,terrain_name)
 
 	if terrain.is_created() or terrain.is_loaded():
+		
+		var center = terrain.get_center(43)
+		for edge in center.borders():
+			Global.print_debug("Corner start :")
+			Global.print_debug(edge.start_corner().point2d())
+			Global.print_debug("Corner end :")
+			Global.print_debug(edge.end_corner().point2d())
+			Global.print_debug("Center start :")
+			Global.print_debug(edge.start_center().point2d())
+			Global.print_debug("Center end :")
+			Global.print_debug(edge.end_center().point2d())
+		
+		"""
+		Global.print_debug("Corners of center :")
+		for corner in center.corners():
+			Global.print_debug(corner.point2d())
+		
+		Global.print_debug("Find neighbors")
+		for neighbor in center.neighbors():
+			Global.print_debug("Corners of neighbor :")
+			for corner in neighbor.corners():
+				Global.print_debug(corner.point2d())
+		"""
+			
 		init_data()
 		add_trees()
 		emit_signal("world_loaded", terrain)
