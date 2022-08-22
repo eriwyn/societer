@@ -1,5 +1,7 @@
 extends Control
 
+class_name WorldGeneration
+
 export(int) var width = 2000
 export(int) var height = 2000
 export(int) var spacing = 20
@@ -14,16 +16,10 @@ export(int) var river_proba = 200
 var rng = RandomNumberGenerator.new()
 var noise = OpenSimplexNoise.new()
 
-var thread
+var step = 0
+var max_step = 5
 
-func _ready():
-	thread = Thread.new()
-	thread.start(self, "_generate_world")
-
-func _exit_tree():
-	thread.wait_to_finish()
-
-func _generate_world():
+func _init():
 	rng.randomize()
 	noise.seed = rng.randi()
 	noise.octaves = octaves
@@ -32,7 +28,8 @@ func _generate_world():
 		Global.terrain.load(Global.terrain_name)
 	else:
 		Global.terrain.create(width,height,spacing,Global.terrain_name)
-		
+	
+	step += 1
 
 	if Global.terrain.is_created():
 		init_data()
@@ -40,12 +37,12 @@ func _generate_world():
 
 	if Global.terrain.is_created() or Global.terrain.is_loaded():
 		add_trees()
-		get_tree().change_scene("res://world/game.tscn")
+		step += 1
+		# get_tree().change_scene("res://world/game.tscn")
 	else:
 		Global.print_debug("Pas de Global.terrain, pas de construction ...")
 		Global.print_debug("Pas de construction ..., pas de palais ...")
 		Global.print_debug("Pas de palais ..., pas de palais.")
-
 
 func init_data():
 	# for point in Global.terrain.get_points():

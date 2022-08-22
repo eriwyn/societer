@@ -33,6 +33,9 @@ func draw_world():
 	st.index()
 	# Commit to a mesh.
 	var mesh = st.commit()
+
+	var file_name = "user://terrain/%s/world.mesh" % (Global.terrain_name)
+	ResourceSaver.save(file_name, mesh)
 	
 	var mi = MeshInstance.new()
 	mi.mesh = mesh
@@ -40,5 +43,4 @@ func draw_world():
 	mi.set_surface_material(0, material)
 	mi.create_trimesh_collision()
 	mi.cast_shadow = GeometryInstance.SHADOW_CASTING_SETTING_ON
-	print(mi)
 	add_child(mi)

@@ -33,13 +33,19 @@ _global_script_classes=[ {
 "class": "Terrain",
 "language": "GDScript",
 "path": "res://utils/terrain/Terrain.gd"
+}, {
+"base": "Control",
+"class": "WorldGeneration",
+"language": "GDScript",
+"path": "res://utils/world_generation/WorldGeneration.gd"
 } ]
 _global_script_class_icons={
 "CameraController": "",
 "CameraOutline": "",
 "Delaunator": "",
 "PoissonDiscSampling": "",
-"Terrain": ""
+"Terrain": "",
+"WorldGeneration": ""
 }
 
 [application]

@@ -11,4 +11,4 @@ func _on_CancelButton_pressed():
 
 func _on_CreateButton_pressed():
 	Global.terrain_name = $VBoxContainer/LineEdit.text
-	get_tree().change_scene("res://utils/world_generation/WorldGeneration.tscn")
+	get_tree().change_scene("res://menu/LoadingScreen.tscn")
