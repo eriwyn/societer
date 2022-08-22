@@ -15,10 +15,6 @@ size = 20.0
 near = 0.01
 far = 8192.0
 script = ExtResource( 3 )
-movement_speed = 70.017
-min_zoom = 51.0
-zoom_sensibility = 2.818
-rotation_sensibility = 1.0
 
 [node name="Node" type="Node" parent="Camera"]
 script = ExtResource( 4 )

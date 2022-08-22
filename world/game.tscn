@@ -3,7 +3,7 @@
 [ext_resource path="res://ui/ui.tscn" type="PackedScene" id=1]
 [ext_resource path="res://world/game.gd" type="Script" id=2]
 [ext_resource path="res://world/default_env.tres" type="Environment" id=3]
-[ext_resource path="res://world/World.gd" type="Script" id=4]
+[ext_resource path="res://world/World3d.gd" type="Script" id=4]
 [ext_resource path="res://utils/camera/CamBase.tscn" type="PackedScene" id=5]
 
 [sub_resource type="PlaneMesh" id=1]
@@ -24,36 +24,34 @@ scale = Vector2( 0.25, 0.25 )
 scale = Vector2( 4, 4 )
 z_index = 3
 
-[node name="World" type="Spatial" parent="."]
+[node name="World3d" type="Spatial" parent="."]
 script = ExtResource( 4 )
 
-[node name="Water" type="MeshInstance" parent="World"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 1000, -0.1, 1000 )
+[node name="Water" type="MeshInstance" parent="World3d"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 1000, 0, 1000 )
 mesh = SubResource( 1 )
 material/0 = SubResource( 2 )
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="World"]
+[node name="WorldEnvironment" type="WorldEnvironment" parent="World3d"]
 environment = ExtResource( 3 )
 
-[node name="CamBase" parent="World" instance=ExtResource( 5 )]
+[node name="CamBase" parent="World3d" instance=ExtResource( 5 )]
 
-[node name="Camera" parent="World/CamBase" index="0"]
-transform = Transform( 1, 0, 0, 0, 0.910272, -0.41401, 0, 0.41401, 0.910272, 0, -1.90735e-06, 6.618 )
-movement_speed = 48.076
-min_zoom = 10.0
+[node name="Camera" parent="World3d/CamBase" index="0"]
+transform = Transform( 1, 0, 0, 0, 0.659983, -0.75128, 0, 0.75128, 0.659983, 0, -1.90735e-06, 6.618 )
+fov = 55.0
 zoom_sensibility = 1.436
-rotation_sensibility = 3.0
 
-[node name="DirectionalLight" type="DirectionalLight" parent="World"]
-transform = Transform( 1, 0, 0, 0, 0.512597, 0.858629, 0, -0.858629, 0.512597, 0, 1.41623, 0 )
+[node name="DirectionalLight" type="DirectionalLight" parent="World3d"]
+transform = Transform( 0.971628, 0.168947, -0.16552, 0, 0.699825, 0.714314, 0.236516, -0.694047, 0.67997, 0, 1.41623, 14.8745 )
 light_energy = 0.1
 shadow_enabled = true
 
 [connection signal="world_loaded" from="." to="UI/Map" method="_on_Game_world_loaded"]
-[connection signal="world_loaded" from="." to="World" method="_on_Game_world_loaded"]
-[connection signal="map_clicked" from="UI/Map" to="World/CamBase/Camera" method="_on_Map_map_clicked"]
-[connection signal="camera_moved" from="World/CamBase/Camera" to="UI/Map/Cursor" method="_on_Camera_camera_moved"]
+[connection signal="world_loaded" from="." to="World3d" method="_on_Game_world_loaded"]
+[connection signal="map_clicked" from="UI/Map" to="World3d/CamBase/Camera" method="_on_Map_map_clicked"]
+[connection signal="camera_moved" from="World3d/CamBase/Camera" to="UI/Map/Cursor" method="_on_Camera_camera_moved"]
 
 [editable path="UI"]
 [editable path="UI/Map"]
-[editable path="World/CamBase"]
+[editable path="World3d/CamBase"]
