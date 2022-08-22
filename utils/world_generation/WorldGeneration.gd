@@ -14,7 +14,16 @@ export(int) var river_proba = 200
 var rng = RandomNumberGenerator.new()
 var noise = OpenSimplexNoise.new()
 
+var thread
+
 func _ready():
+	thread = Thread.new()
+	thread.start(self, "_generate_world")
+
+func _exit_tree():
+	thread.wait_to_finish()
+
+func _generate_world():
 	rng.randomize()
 	noise.seed = rng.randi()
 	noise.octaves = octaves
@@ -36,6 +45,7 @@ func _ready():
 		Global.print_debug("Pas de Global.terrain, pas de construction ...")
 		Global.print_debug("Pas de construction ..., pas de palais ...")
 		Global.print_debug("Pas de palais ..., pas de palais.")
+
 
 func init_data():
 	# for point in Global.terrain.get_points():
