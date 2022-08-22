@@ -26,8 +26,8 @@ class VoronoiCenters:
 		return _should_continue()
 		
 	func _iter_get(_arg):
-		var point = Point.new(_curr,_terrain)
-		return point
+		var center = VoronoiCenter.new(_curr,_terrain)
+		return center
 		
 	func size():
 		return _end
@@ -98,6 +98,12 @@ class VoronoiCenter:
 			var corner = VoronoiCorner.new(triangle)
 			list_corners.append(corner)
 		return list_corners
+		
+	func polygon():
+		var polygon = []
+		for corner in corners():
+			polygon.append(corner.point2d())
+		return polygon
 
 # Voronoi Corner object
 class VoronoiCorner:
@@ -111,6 +117,28 @@ class VoronoiCorner:
 		
 	func point2d():
 		return _triangle.center2d()
+		
+	func touches():
+		var list_centers = []
+		for point in _triangle.points():
+			list_centers.append(point.to_center())
+		return list_centers
+		
+	func protudes():
+		var list_edges = []
+		for edge in _triangle.edges():
+			var center_start = edge.start().to_center()
+			var center_end = edge.end().to_center()
+			var corner_start = VoronoiCorner.new(edge.triangle())
+			var corner_end = VoronoiCorner.new(edge.opposite().triangle())
+			list_edges.append(VoronoiEdge.new(corner_start,corner_end,center_start,center_end))
+		return list_edges
+		
+	func adjacents():
+		var list_corners = []
+		for triangle in _triangle.adjacents():
+			list_corners.append(VoronoiCorner.new(triangle))
+		return list_corners
 
 # Voronoi Edge object
 class VoronoiEdge:
@@ -136,6 +164,12 @@ class VoronoiEdge:
 		
 	func end_center():
 		return _end_center
+		
+	func line():
+		var line = []
+		line.append(start_corner().point2d())
+		line.append(end_corner().point2d())
+		return line
 
 # Triangles iterator
 class Triangles:
@@ -199,7 +233,7 @@ class Triangle:
 			list_points.append(Point.new(_terrain._triangles[edge._idx], _terrain))
 		return list_points
 		
-	func triangles_adjacent():
+	func adjacents():
 		var list_triangles = []
 		for edge in edges():
 			var opposite = Edge.new(_terrain._halfedges[edge._idx], _terrain)
@@ -293,13 +327,14 @@ class Point:
 		
 	func edges_around():
 		var list_edges = []
-		var incoming_edge = Edge.new(_idx, _terrain)
+		var incoming = _terrain._points_to_halfedges.get(_idx)
+		var incoming_edge = Edge.new(incoming, _terrain)
 		var outgoing_edge
 		while true:
 			list_edges.append(incoming_edge);
 			outgoing_edge = incoming_edge.next_half()
 			incoming_edge = Edge.new(_terrain._halfedges[outgoing_edge._idx], _terrain);
-			if not (incoming_edge._idx != -1 and incoming_edge._idx != _idx):
+			if not (incoming_edge._idx != -1 and incoming_edge._idx != incoming):
 				break
 		return list_edges
 		
@@ -320,6 +355,7 @@ class Point:
 		var list_triangles = []
 		for edge in edges_around():
 			list_triangles.append(edge.triangle())
+#			list_triangles.append(edge.opposite().triangle())
 		return list_triangles
 
 # Edges iterator
@@ -356,7 +392,7 @@ class Edge:
 	var _idx
 	var _terrain
 	
-	func _init(idx, terrain):
+	func _init(idx:int, terrain):
 		self._idx = idx
 		self._terrain = terrain
 		
@@ -527,6 +563,10 @@ func get_points():
 	
 func get_point(idx):
 	return Point.new(idx, self)
+
+func get_centers():
+	var centers = VoronoiCenters.new(self)
+	return centers
 	
 func get_center(idx):
 	return VoronoiCenter.new(idx, self)
@@ -698,10 +738,7 @@ func get_voronoi_edges_as_line():
 
 func get_voronoi_cells_as_polygon():
 	var list_polygon = []
-	for point in get_points():
-		var polygon = []
-		for edge in point.edges_around():
-			polygon.append(edge.triangle().center2d())
-		list_polygon.append(polygon)
+	for center in get_centers():
+		list_polygon.append(center.polygon())
 	return(list_polygon)
 			
