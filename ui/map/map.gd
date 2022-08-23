@@ -87,7 +87,7 @@ func draw_voronoi_cells_convex_hull():
 	
 func _draw():
 	print("before drawing")
-	# heightmap()
+	heightmap()
 #	draw_voronoi_cells()
 #	draw_triangles_edges()
 	# draw_voronoi_cells_convex_hull()

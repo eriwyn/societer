@@ -26,8 +26,18 @@ func _init():
 		Global.terrain.load(Global.terrain_name)
 	else:
 		Global.terrain.create(width,height,spacing,Global.terrain_name)
-		
-	Global.loading.set_max_step(Global.terrain.get_triangles().size() + height)
+	
+	var max_step = (
+		Global.terrain.get_triangles().size()
+		# + height
+	)
+
+	if Global.terrain.is_created():
+		max_step += Global.terrain.get_points().size()
+		max_step += Global.terrain.get_triangles().size()
+		Global.loading.set_step(Global.terrain.get_points().size())
+
+	Global.loading.set_max_step(max_step)
 
 	if Global.terrain.is_created():
 		init_data()
@@ -35,13 +45,15 @@ func _init():
 		
 	if Global.terrain.is_created() or Global.terrain.is_loaded():
 		Global.terrain.set_data("mesh", create_mesh())
-		create_map()
+		# create_map()
 		# add_trees()
 		# get_tree().change_scene("res://world/game.tscn")
 	else:
 		Global.print_debug("Pas de Global.terrain, pas de construction ...")
 		Global.print_debug("Pas de construction ..., pas de palais ...")
 		Global.print_debug("Pas de palais ..., pas de palais.")
+
+	Global.loading.set_end_time()
 
 func init_data():
 	# for point in Global.terrain.get_points():
@@ -68,6 +80,7 @@ func init_data():
 				print(triangle.get_elevation())
 		if triangle.is_water():
 			triangle.set_elevation(0)
+		Global.loading.increment_step()
 	# 	triangle.set_data("ocean", false)
 	# 	for point in triangle.points():
 	# 		if point.get_data("ocean"):
@@ -246,18 +259,16 @@ func create_mesh():
 	mi.cast_shadow = GeometryInstance.SHADOW_CASTING_SETTING_ON
 	return mi
 
+# Enregistrement de la map + intégration dans la génération du monde #32 
+
 func create_map():
 	var img = Image.new()
 	img.create(width, height, false, Image.FORMAT_RGBA8)
 	img.lock()
 
 	for y in height:
-		# print(y)
 		Global.loading.increment_step()
 		for x in width:
 			img.set_pixel(x,y,Color(randf(), randf(), randf()))
 	
 	img.unlock()
-
-
-	pass

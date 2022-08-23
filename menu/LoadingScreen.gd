@@ -12,9 +12,9 @@ func _ready():
 
 func _process(_delta): 
 	$ProgressBar.value = Global.loading.get_percentage()
-	if (Global.loading.get_percentage() >= 100):
-		Global.loading.set_end_time()
-		print(Global.loading.get_elapsed_time("s"))
+	if (Global.loading.get_end_time() > 0):
+		
+		Global.print_debug("Elapsed time : %f seconds" % Global.loading.get_elapsed_time("s"))
 		get_tree().change_scene("res://world/game.tscn")
 
 func _exit_tree():
