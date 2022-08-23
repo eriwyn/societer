@@ -392,6 +392,13 @@ func _create_points():
 		_points[point_idx].z = points2d[point_idx].y
 	
 # Terrain methodes
+func set_data(key,value):
+	_data[key] = value
+	
+func get_data(key):
+	if _data.has(key):
+		return _data[key]
+
 func get_triangles():
 	var triangles = Triangles.new(self)
 	return triangles

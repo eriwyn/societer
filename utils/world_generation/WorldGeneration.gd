@@ -1,4 +1,4 @@
-extends Control
+extends Reference
 
 class_name WorldGeneration
 
@@ -16,28 +16,27 @@ export(int) var river_proba = 200
 var rng = RandomNumberGenerator.new()
 var noise = OpenSimplexNoise.new()
 
-var step = 0
-var max_step = 5
-
 func _init():
+	Global.loading.reset()
 	rng.randomize()
 	noise.seed = rng.randi()
 	noise.octaves = octaves
-		
+	
 	if Global.terrain.exists(Global.terrain_name):
 		Global.terrain.load(Global.terrain_name)
 	else:
 		Global.terrain.create(width,height,spacing,Global.terrain_name)
-	
-	step += 1
+		
+	Global.loading.set_max_step(Global.terrain.get_triangles().size() + height)
 
 	if Global.terrain.is_created():
 		init_data()
 		Global.terrain.save()
-
+		
 	if Global.terrain.is_created() or Global.terrain.is_loaded():
-		add_trees()
-		step += 1
+		Global.terrain.set_data("mesh", create_mesh())
+		create_map()
+		# add_trees()
 		# get_tree().change_scene("res://world/game.tscn")
 	else:
 		Global.print_debug("Pas de Global.terrain, pas de construction ...")
@@ -201,13 +200,64 @@ func edge_is_river(edge):
 		return true
 	return false
 
-func add_trees():
-	rng.randomize()
-	var treescene = load("res://entities/environment/birchtree/birchtree.tscn")
+# func add_trees():
+# 	rng.randomize()
+# 	var treescene = load("res://entities/environment/birchtree/birchtree.tscn")
+# 	for triangle in Global.terrain.get_triangles():
+# 		if not triangle.get_data("water"):
+# 			var num = rng.randi_range(0, 5)
+# 			if num == 1:
+# 				var tree = treescene.instance()
+# 				tree.translation = Vector3(triangle.center3d() * Vector3(1, 12*10, 1))
+# 				add_child(tree)
+
+func create_mesh():
+	var st = SurfaceTool.new()
+
+	st.begin(Mesh.PRIMITIVE_TRIANGLES)
 	for triangle in Global.terrain.get_triangles():
-		if not triangle.get_data("water"):
-			var num = rng.randi_range(0, 5)
-			if num == 1:
-				var tree = treescene.instance()
-				tree.translation = Vector3(triangle.center3d() * Vector3(1, 12*10, 1))
-				add_child(tree)
+		if not triangle.is_water():
+			if triangle.get_elevation() < 0:
+				print(triangle.get_elevation())
+			var factor = Vector3(1, 120, 1)
+			for edge in triangle.edges():
+				if triangle.get_elevation() > edge.opposite_triangle().get_elevation():
+					st.add_vertex(Vector3(edge.start().point3d().x, triangle.get_elevation(), edge.start().point3d().z) * factor)
+					st.add_vertex(Vector3(edge.end().point3d().x, triangle.get_elevation(), edge.end().point3d().z) * factor)
+					st.add_vertex(Vector3(edge.start().point3d().x, edge.opposite_triangle().get_elevation(), edge.start().point3d().z) * factor)
+					
+					st.add_vertex(Vector3(edge.end().point3d().x, triangle.get_elevation(), edge.end().point3d().z) * factor)
+					st.add_vertex(Vector3(edge.end().point3d().x, edge.opposite_triangle().get_elevation(), edge.end().point3d().z) * factor)
+					st.add_vertex(Vector3(edge.start().point3d().x, edge.opposite_triangle().get_elevation(), edge.start().point3d().z) * factor)
+						
+			for point in triangle.points():
+				st.add_vertex(Vector3(point.point3d().x, triangle.get_elevation(), point.point3d().z) * factor)
+		Global.loading.increment_step()
+
+	st.generate_normals()
+	st.generate_tangents()
+	st.index()
+
+	var mi = MeshInstance.new()
+	mi.mesh = st.commit()
+	var material = load("res://world/world.material")
+	mi.set_surface_material(0, material)
+	mi.create_convex_collision()
+	mi.cast_shadow = GeometryInstance.SHADOW_CASTING_SETTING_ON
+	return mi
+
+func create_map():
+	var img = Image.new()
+	img.create(width, height, false, Image.FORMAT_RGBA8)
+	img.lock()
+
+	for y in height:
+		# print(y)
+		Global.loading.increment_step()
+		for x in width:
+			img.set_pixel(x,y,Color(randf(), randf(), randf()))
+	
+	img.unlock()
+
+
+	pass

@@ -34,7 +34,7 @@ _global_script_classes=[ {
 "language": "GDScript",
 "path": "res://utils/terrain/Terrain.gd"
 }, {
-"base": "Control",
+"base": "Reference",
 "class": "WorldGeneration",
 "language": "GDScript",
 "path": "res://utils/world_generation/WorldGeneration.gd"
