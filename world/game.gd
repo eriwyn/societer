@@ -27,7 +27,7 @@ func _ready():
 
 	terrain = Terrain.new()
 
-	print(terrain.list())
+	Global.print_debug(terrain.list())
 	
 	if terrain.exists(terrain_name):
 		terrain.load(terrain_name)
