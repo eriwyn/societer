@@ -641,6 +641,31 @@ func save():
 	save_parameter()
 	save_graph()
 	save_data()
+	
+func delete(name):
+	var directory = Directory.new()
+	Global.print_debug("Delete terrain : %s" %(name))
+	
+	# Goto terrain directory
+	directory.open("user://")
+	if not directory.dir_exists("terrain"):
+		directory.make_dir("terrain")
+	directory.change_dir("terrain")
+	if directory.dir_exists(name):
+		directory.change_dir(name)
+		directory.list_dir_begin()
+		var filename = directory.get_next()
+		while filename != "":
+			if( directory.file_exists(filename)):
+				print("Found file: " + filename)
+				directory.remove(filename)
+			filename = directory.get_next()
+		directory.list_dir_end()
+		directory.change_dir("..")
+		var result = directory.remove(name)
+		if(result != OK):
+			print(result)
+			
 
 func save_parameter():
 	var file = File.new()
