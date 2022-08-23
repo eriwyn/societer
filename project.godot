@@ -33,19 +33,25 @@ _global_script_classes=[ {
 "class": "Terrain",
 "language": "GDScript",
 "path": "res://utils/terrain/Terrain.gd"
+}, {
+"base": "Reference",
+"class": "WorldGeneration",
+"language": "GDScript",
+"path": "res://utils/world_generation/WorldGeneration.gd"
 } ]
 _global_script_class_icons={
 "CameraController": "",
 "CameraOutline": "",
 "Delaunator": "",
 "PoissonDiscSampling": "",
-"Terrain": ""
+"Terrain": "",
+"WorldGeneration": ""
 }
 
 [application]
 
 config/name="Societer"
-run/main_scene="res://world/game.tscn"
+run/main_scene="res://menu/MainMenu.tscn"
 config/icon="res://icon.png"
 
 [autoload]

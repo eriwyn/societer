@@ -1,0 +1,64 @@
+[gd_scene load_steps=5 format=2]
+
+[ext_resource path="res://theme/theme.tres" type="Theme" id=1]
+[ext_resource path="res://theme/fonts/monogram.ttf" type="DynamicFontData" id=2]
+[ext_resource path="res://menu/NewWorld.gd" type="Script" id=3]
+
+[sub_resource type="DynamicFont" id=1]
+size = 35
+font_data = ExtResource( 2 )
+
+[node name="NewWorld" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+rect_pivot_offset = Vector2( -383, -181 )
+theme = ExtResource( 1 )
+script = ExtResource( 3 )
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -195.0
+margin_top = -85.0
+margin_right = 195.0
+margin_bottom = 85.0
+
+[node name="Title" type="Label" parent="VBoxContainer"]
+margin_right = 390.0
+margin_bottom = 64.0
+text = "Nouveau monde"
+align = 1
+
+[node name="Label" type="Label" parent="VBoxContainer"]
+margin_top = 68.0
+margin_right = 390.0
+margin_bottom = 97.0
+custom_fonts/font = SubResource( 1 )
+text = "Nom du monde :"
+
+[node name="LineEdit" type="LineEdit" parent="VBoxContainer"]
+margin_top = 101.0
+margin_right = 390.0
+margin_bottom = 125.0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
+margin_top = 129.0
+margin_right = 390.0
+margin_bottom = 170.0
+
+[node name="CreateButton" type="Button" parent="VBoxContainer/HBoxContainer"]
+margin_right = 247.0
+margin_bottom = 41.0
+text = "Nouveau monde"
+
+[node name="CancelButton" type="Button" parent="VBoxContainer/HBoxContainer"]
+margin_left = 251.0
+margin_right = 390.0
+margin_bottom = 41.0
+size_flags_horizontal = 3
+text = "Annuler"
+
+[connection signal="pressed" from="VBoxContainer/HBoxContainer/CreateButton" to="." method="_on_CreateButton_pressed"]
+[connection signal="pressed" from="VBoxContainer/HBoxContainer/CancelButton" to="." method="_on_CancelButton_pressed"]

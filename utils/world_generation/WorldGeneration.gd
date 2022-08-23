@@ -1,6 +1,6 @@
-extends Node
+extends Reference
 
-signal world_loaded
+class_name WorldGeneration
 
 export(int) var width = 2048
 export(int) var height = 2048
@@ -16,35 +16,47 @@ export(int) var river_proba = 200
 var rng = RandomNumberGenerator.new()
 var noise = OpenSimplexNoise.new()
 
-var terrain
-
-func _ready():
+func _init():
+	Global.loading.reset()
 	rng.randomize()
 	noise.seed = rng.randi()
 	noise.octaves = octaves
 	
-	var terrain_name="bonjour01"
-
-	terrain = Terrain.new()
-
-	Global.print_debug(terrain.list())
+	if Global.terrain.exists(Global.terrain_name):
+		Global.terrain.load(Global.terrain_name)
+	else:
+		Global.terrain.create(width,height,spacing,Global.terrain_name)
 	
-	if terrain.exists(terrain_name):
-		terrain.load(terrain_name)
-	else:
-		terrain.create(width,height,spacing,terrain_name)
+	var max_step = (
+		Global.terrain.get_triangles().size()
+		# + height
+	)
 
-	if terrain.is_created() or terrain.is_loaded():	
+	if Global.terrain.is_created():
+		max_step += Global.terrain.get_points().size()
+		max_step += Global.terrain.get_triangles().size()
+		Global.loading.set_step(Global.terrain.get_points().size())
+
+	Global.loading.set_max_step(max_step)
+
+	if Global.terrain.is_created():
 		init_data()
-		add_trees()
-		emit_signal("world_loaded", terrain)
+		Global.terrain.save()
+		
+	if Global.terrain.is_created() or Global.terrain.is_loaded():
+		Global.terrain.set_data("mesh", create_mesh())
+		# create_map()
+		# add_trees()
+		# get_tree().change_scene("res://world/game.tscn")
 	else:
-		Global.print_debug("Pas de terrain, pas de construction ...")
+		Global.print_debug("Pas de Global.terrain, pas de construction ...")
 		Global.print_debug("Pas de construction ..., pas de palais ...")
 		Global.print_debug("Pas de palais ..., pas de palais.")
 
+	Global.loading.set_end_time()
+
 func init_data():
-	# for point in terrain.get_points():
+	# for point in Global.terrain.get_points():
 		# point.set_elevation(point_find_elevation(point.point2d()))
 		# point.set_data("water", point_is_water(point))
 		# point.set_data("mountain", point_is_mountain(point))
@@ -52,16 +64,14 @@ func init_data():
 
 	# fill_oceans()
 	
-	# for point in terrain.get_points():
+	# for point in Global.terrain.get_points():
 	# 	if point.get_data("water") and not point.get_data("ocean"):
 	# 		point.set_elevation(0.1)
 	# 		point.set_data("water", false)
 	# 	point.set_data("coast", point_is_coast(point))
 	# 	if point.get_data("river"):
 	# 		set_river_path(point)
-	var triangles = 0
-	for triangle in terrain.get_triangles():
-		triangles += 1
+	for triangle in Global.terrain.get_triangles():
 		triangle.set_elevation(find_elevation(triangle.center2d()))
 		# triangle.set_data("elevation", triangle_find_elevation(triangle))
 		triangle.set_data("water", triangle_is_water(triangle))
@@ -70,23 +80,24 @@ func init_data():
 				print(triangle.get_elevation())
 		if triangle.is_water():
 			triangle.set_elevation(0)
+		Global.loading.increment_step()
 	# 	triangle.set_data("ocean", false)
 	# 	for point in triangle.points():
 	# 		if point.get_data("ocean"):
 	# 			triangle.set_data("ocean", true)
-	# for edge in terrain.get_edges():
+	# for edge in Global.terrain.get_edges():
 	# 	edge.set_data("coast", edge_is_coast(edge))
 	# 	edge.set_data("river", edge_is_river(edge))
-	print(triangles)
+
 func fill_oceans():
 	var stack = []
-	for point in terrain.get_points():
+	for point in Global.terrain.get_points():
 		if point.point2d().x < 10 and point.get_data("water") and not point.get_data("ocean"):
 			stack.append(point.get_index())
 			while stack.size():
 				var current_point_id = stack.pop_back()
-				terrain.get_point(current_point_id).set_data("ocean", true)
-				for neighbour in terrain.get_point(current_point_id).points_around():
+				Global.terrain.get_point(current_point_id).set_data("ocean", true)
+				for neighbour in Global.terrain.get_point(current_point_id).points_around():
 					if neighbour.get_data("water") and not neighbour.get_data("ocean"):
 						stack.append(neighbour.get_index())
 			break
@@ -101,13 +112,13 @@ func set_river_path(point):
 	
 	while stack.size():
 		var current_point_id = stack.pop_front()
-		if terrain.get_point(current_point_id).get_elevation() < start_elevation:
+		if Global.terrain.get_point(current_point_id).get_elevation() < start_elevation:
 			waypoints.append(current_point_id)
-			start_elevation = terrain.get_point(current_point_id).get_elevation()
+			start_elevation = Global.terrain.get_point(current_point_id).get_elevation()
 			stack = []
-		if terrain.get_point(current_point_id).get_data("ocean"):
+		if Global.terrain.get_point(current_point_id).get_data("ocean"):
 			break
-		for neighbour in terrain.get_point(current_point_id).points_around():
+		for neighbour in Global.terrain.get_point(current_point_id).points_around():
 			if not came_from.has(neighbour.get_index()):
 				stack.append(neighbour.get_index())
 				came_from[neighbour.get_index()] = current_point_id
@@ -122,8 +133,8 @@ func set_river_path(point):
 	
 	path.append(point.get_index())
 	for index in path:
-		terrain.get_point(index).set_data("river", true)
-		# terrain.get_point(index).set_data("water", true)
+		Global.terrain.get_point(index).set_data("river", true)
+		# Global.terrain.get_point(index).set_data("water", true)
 
 # Point
 
@@ -202,13 +213,62 @@ func edge_is_river(edge):
 		return true
 	return false
 
-func add_trees():
-	rng.randomize()
-	var treescene = load("res://entities/environment/birchtree/birchtree.tscn")
-	for triangle in terrain.get_triangles():
-		if not triangle.get_data("water"):
-			var num = rng.randi_range(0, 5)
-			if num == 1:
-				var tree = treescene.instance()
-				tree.translation = Vector3(triangle.center3d() * Vector3(1, 12*10, 1))
-				add_child(tree)
+# func add_trees():
+# 	rng.randomize()
+# 	var treescene = load("res://entities/environment/birchtree/birchtree.tscn")
+# 	for triangle in Global.terrain.get_triangles():
+# 		if not triangle.get_data("water"):
+# 			var num = rng.randi_range(0, 5)
+# 			if num == 1:
+# 				var tree = treescene.instance()
+# 				tree.translation = Vector3(triangle.center3d() * Vector3(1, 12*10, 1))
+# 				add_child(tree)
+
+func create_mesh():
+	var st = SurfaceTool.new()
+
+	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	for triangle in Global.terrain.get_triangles():
+		if not triangle.is_water():
+			if triangle.get_elevation() < 0:
+				print(triangle.get_elevation())
+			var factor = Vector3(1, 120, 1)
+			for edge in triangle.edges():
+				if triangle.get_elevation() > edge.opposite_triangle().get_elevation():
+					st.add_vertex(Vector3(edge.start().point3d().x, triangle.get_elevation(), edge.start().point3d().z) * factor)
+					st.add_vertex(Vector3(edge.end().point3d().x, triangle.get_elevation(), edge.end().point3d().z) * factor)
+					st.add_vertex(Vector3(edge.start().point3d().x, edge.opposite_triangle().get_elevation(), edge.start().point3d().z) * factor)
+					
+					st.add_vertex(Vector3(edge.end().point3d().x, triangle.get_elevation(), edge.end().point3d().z) * factor)
+					st.add_vertex(Vector3(edge.end().point3d().x, edge.opposite_triangle().get_elevation(), edge.end().point3d().z) * factor)
+					st.add_vertex(Vector3(edge.start().point3d().x, edge.opposite_triangle().get_elevation(), edge.start().point3d().z) * factor)
+						
+			for point in triangle.points():
+				st.add_vertex(Vector3(point.point3d().x, triangle.get_elevation(), point.point3d().z) * factor)
+		Global.loading.increment_step()
+
+	st.generate_normals()
+	st.generate_tangents()
+	st.index()
+
+	var mi = MeshInstance.new()
+	mi.mesh = st.commit()
+	var material = load("res://world/world.material")
+	mi.set_surface_material(0, material)
+	mi.create_convex_collision()
+	mi.cast_shadow = GeometryInstance.SHADOW_CASTING_SETTING_ON
+	return mi
+
+# Enregistrement de la map + intégration dans la génération du monde #32 
+
+func create_map():
+	var img = Image.new()
+	img.create(width, height, false, Image.FORMAT_RGBA8)
+	img.lock()
+
+	for y in height:
+		Global.loading.increment_step()
+		for x in width:
+			img.set_pixel(x,y,Color(randf(), randf(), randf()))
+	
+	img.unlock()

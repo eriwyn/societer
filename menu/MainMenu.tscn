@@ -1,0 +1,52 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://theme/theme.tres" type="Theme" id=1]
+[ext_resource path="res://menu/MainMenu.gd" type="Script" id=2]
+
+[sub_resource type="Theme" id=1]
+
+[node name="MainMenu" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme = ExtResource( 1 )
+script = ExtResource( 2 )
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -158.0
+margin_top = -74.5
+margin_right = 158.0
+margin_bottom = 74.5
+
+[node name="Title" type="Label" parent="VBoxContainer"]
+margin_right = 316.0
+margin_bottom = 131.0
+text = "Societer
+"
+align = 1
+
+[node name="NewButton" type="Button" parent="VBoxContainer"]
+margin_top = 135.0
+margin_right = 316.0
+margin_bottom = 176.0
+theme = SubResource( 1 )
+text = "Nouveau monde"
+
+[node name="LoadButton" type="Button" parent="VBoxContainer"]
+margin_top = 180.0
+margin_right = 316.0
+margin_bottom = 221.0
+text = "Charger un monde"
+
+[node name="QuitButton" type="Button" parent="VBoxContainer"]
+margin_top = 225.0
+margin_right = 316.0
+margin_bottom = 266.0
+text = "Quitter"
+
+[connection signal="pressed" from="VBoxContainer/NewButton" to="." method="_on_NewButton_pressed"]
+[connection signal="pressed" from="VBoxContainer/LoadButton" to="." method="_on_LoadButton_pressed"]
+[connection signal="pressed" from="VBoxContainer/QuitButton" to="." method="_on_QuitButton_pressed"]
