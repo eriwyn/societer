@@ -38,6 +38,7 @@ environment = ExtResource( 3 )
 [node name="Camera" parent="World3d/CamBase" index="0"]
 transform = Transform( 1, 0, 0, 0, 0.659983, -0.75128, 0, 0.75128, 0.659983, 0, -1.90735e-06, 6.618 )
 fov = 55.0
+depth_multiplier = 99.0
 zoom_sensibility = 1.436
 
 [node name="DirectionalLight" type="DirectionalLight" parent="World3d"]

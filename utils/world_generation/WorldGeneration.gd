@@ -2,8 +2,8 @@ extends Reference
 
 class_name WorldGeneration
 
-export(int) var width = 2000
-export(int) var height = 2000
+export(int) var width = 2048
+export(int) var height = 2048
 export(int) var spacing = 20
 export(int, 1, 9) var octaves = 5
 export(int, 1, 30) var wavelength = 8
