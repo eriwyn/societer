@@ -309,8 +309,15 @@ class Point:
 	func to_center():
 		return VoronoiCenter.new(_idx, _terrain)
 		
+	func find_index():
+		var vect=point2d()
+		return int(vect[0] / 64.0) * 32 + int(vect[1] / 64.0)
+		
 	func get_index():
 		return _idx
+		
+	func distance(vect):
+		return(point2d().distance_to(vect))
 
 	func has_key(key):
 		return _terrain._points_data[_idx].has(key)
@@ -533,6 +540,14 @@ func create(width:int, height:int, spacing:int, name:String):
 	_halfedges = PoolIntArray(delaunay.halfedges)
 	_triangles = PoolIntArray(delaunay.triangles)
 	
+	# Initialize find_point
+	_data["find_point"]=[]
+	_data["find_point"].resize(1024)
+	for idx in 1024:
+		_data["find_point"][idx]=[]
+	for point in get_points():
+		_data["find_point"][point.find_index()].append(point.get_index())
+	
 	# Initialize _points_to_halfedges
 	for edge in get_edges():
 		var endpoint = _triangles[edge.next_half().get_index()]
@@ -579,7 +594,23 @@ func get_points():
 	
 func get_point(idx):
 	return Point.new(idx, self)
-
+	
+func find_point(vect):
+	var selected_point
+	var minimum = 999999.99
+	for idx in _data["find_point"][int(vect[0] / 64.0) * 32 + int(vect[1] / 64.0)]:
+		var point=get_point(idx)
+		var distance = point.distance(vect)
+		if(distance < minimum):
+			selected_point = point
+			minimum=distance
+	for point_around in selected_point.points_around():
+			var distance = point_around.distance(vect)
+			if(distance < minimum):
+				selected_point = point_around
+				minimum=distance
+	return selected_point
+			
 func get_centers():
 	var centers = VoronoiCenters.new(self)
 	return centers

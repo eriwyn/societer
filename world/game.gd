@@ -2,8 +2,8 @@ extends Node
 
 signal world_loaded
 
-export(int) var width = 2000
-export(int) var height = 2000
+export(int) var width = 2048
+export(int) var height = 2048
 export(int) var spacing = 20
 export(int, 1, 9) var octaves = 5
 export(int, 1, 30) var wavelength = 8
@@ -34,31 +34,7 @@ func _ready():
 	else:
 		terrain.create(width,height,spacing,terrain_name)
 
-	if terrain.is_created() or terrain.is_loaded():
-		
-		var center = terrain.get_center(43)
-		for edge in center.borders():
-			Global.print_debug("Corner start :")
-			Global.print_debug(edge.start_corner().point2d())
-			Global.print_debug("Corner end :")
-			Global.print_debug(edge.end_corner().point2d())
-			Global.print_debug("Center start :")
-			Global.print_debug(edge.start_center().point2d())
-			Global.print_debug("Center end :")
-			Global.print_debug(edge.end_center().point2d())
-		
-		"""
-		Global.print_debug("Corners of center :")
-		for corner in center.corners():
-			Global.print_debug(corner.point2d())
-		
-		Global.print_debug("Find neighbors")
-		for neighbor in center.neighbors():
-			Global.print_debug("Corners of neighbor :")
-			for corner in neighbor.corners():
-				Global.print_debug(corner.point2d())
-		"""
-			
+	if terrain.is_created() or terrain.is_loaded():	
 		init_data()
 		add_trees()
 		emit_signal("world_loaded", terrain)
