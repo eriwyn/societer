@@ -326,7 +326,7 @@ func create_mesh():
 	mi.mesh = st.commit()
 	var material = load("res://world/world.material")
 	mi.set_surface_material(0, material)
-	mi.create_convex_collision()
+	mi.create_trimesh_collision()
 	mi.cast_shadow = GeometryInstance.SHADOW_CASTING_SETTING_ON
 	return mi
 

@@ -172,6 +172,7 @@ environment = ExtResource( 3 )
 [node name="CamBase" parent="World3d" instance=ExtResource( 5 )]
 
 [node name="Camera" parent="World3d/CamBase" index="0"]
+physics_interpolation_mode = 1
 transform = Transform( 1, 0, 0, 0, 0.659983, -0.75128, 0, 0.75128, 0.659983, 0, -5.72205e-06, 6.618 )
 fov = 55.0
 depth_threshold = 0.001
@@ -182,12 +183,6 @@ zoom_sensibility = 1.436
 transform = Transform( 0.971628, 0.168947, -0.16552, 0, 0.699825, 0.714314, 0.236516, -0.694047, 0.67997, 0, 1.41623, 14.8745 )
 light_energy = 0.1
 shadow_enabled = true
-
-[node name="CSGBox" type="CSGBox" parent="World3d"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 72.3742, 1.07915, 70.9729 )
-width = 15.1059
-height = 12.3889
-depth = 42.8385
 
 [connection signal="map_clicked" from="UI/Map" to="World3d/CamBase/Camera" method="_on_Map_map_clicked"]
 [connection signal="camera_moved" from="World3d/CamBase/Camera" to="UI/Map/Cursor" method="_on_Camera_camera_moved"]

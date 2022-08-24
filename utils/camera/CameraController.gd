@@ -25,7 +25,7 @@ export(float, 10,100) var max_zoom = 100
 export(float, 1,3) var zoom_sensibility = 1.4
 
 export(float, 1,3) var rotation_sensibility = 2.3
-export(float, 1.0, 10.0) var height = 15.0
+export(float, 1.0, 20.0) var height = 15.0
 
 var pitch : float
 var yaw : float
