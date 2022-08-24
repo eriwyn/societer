@@ -3,29 +3,38 @@ extends Node2D
 signal map_clicked
 
 func heightmap():
+	draw_rect(Rect2(Vector2(0, 0), Vector2(2048, 2048)), Color("#0e88bd"))
 	print (Global.terrain)
-	for triangle in Global.terrain.get_triangles():
-		var colors = Gradient.new()
-		colors.add_point(0.999,  Color("#9e0142")) # red
-		colors.add_point(0.5,  Color("#dc865d")) # orange
-		colors.add_point(0.25,  Color("#fbf8b0")) # yellow
-		colors.add_point(0.0,  Color("#89cfa5")) # green
-		colors.add_point(-0.999,  Color("#5e4fa2")) # blue
-		var color = colors.interpolate(min(triangle.get_elevation() + 0.001, 0.999))
-		# color = Color.green
-		if triangle.is_water():
-			# var factor = pow((triangle.get_elevation()+1.001), 10) / 5.0
-			color = Color("#5e4fa2")
-		if triangle.polygon().size() > 2:
-			draw_polygon(triangle.polygon(), PoolColorArray([color]))
+	for center in Global.terrain.get_centers():
+		if not center.get_data("ocean"):
+			var colors = Gradient.new()
+			colors.add_point(0.999,  Color("#9e0142")) # red
+			colors.add_point(0.5,  Color("#dc865d")) # orange
+			colors.add_point(0.25,  Color("#fbf8b0")) # yellow
+			colors.add_point(0.0,  Color("#89cfa5")) # green
+			colors.add_point(-0.999,  Color("#5e4fa2")) # blue
+			var color = colors.interpolate(min(center.get_elevation() + 0.001, 0.999))
+			# color = Color.green
+			if center.get_data("ocean"):
+				# var factor = pow((center.get_elevation()+1.001), 10) / 5.0
+				color = Color("#5e4fa2")
+			# if center.get_data("coast"):
+				# color = Color.black
+			if center.polygon().size() > 2:
+				draw_polygon(center.polygon(), PoolColorArray([color]))
 
 	var coastline = PoolVector2Array()
-	for edge in Global.terrain.get_edges():
-		if edge.get_data("coast"):
-			coastline.append(edge.line()[0])
-			coastline.append(edge.line()[1])
-		if edge.get_data("river"):
-			draw_line(edge.line()[0], edge.line()[1], Color.blue, 5.0)
+	for center in Global.terrain.get_centers():
+		if center.get_data("coast"):
+			for border in center.borders():
+				if (border.end_center().get_data("ocean")):
+					coastline.append(border.line()[0])
+					coastline.append(border.line()[1])
+	# for edge in Global.terrain.get_edges():
+	# 	if edge.get_data("coast"):
+			
+	# 	if edge.get_data("river"):
+	# 		draw_line(edge.line()[0], edge.line()[1], Color.blue, 5.0)
 	draw_multiline(coastline, Color.black)
 	
 func draw_triangles_edges(color=Color("#000000")):
