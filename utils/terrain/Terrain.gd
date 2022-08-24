@@ -244,11 +244,40 @@ class Triangle:
 
 	func center2d():
 		var points = points()
-		return (points[0].point2d() + points[1].point2d() + points[2].point2d()) / 3.0
+		var a = points[0].point2d()
+		var b = points[1].point2d()
+		var c = points[2].point2d()
+		var ad = a[0] * a[0] + a[1] * a[1]
+		var bd = b[0] * b[0] + b[1] * b[1]
+		var cd = c[0] * c[0] + c[1] * c[1]
+		var D = 2 * (a[0] * (b[1] - c[1]) + b[0] * (c[1] - a[1]) + c[0] * (a[1] - b[1]))
+
+		return Vector2(
+			1 / D * (ad * (b[1] - c[1]) + bd * (c[1] - a[1]) + cd * (a[1] - b[1])),
+			1 / D * (ad * (c[0] - b[0]) + bd * (a[0] - c[0]) + cd * (b[0] - a[0]))
+		)
+		# return (points[0].point2d() + points[1].point2d() + points[2].point2d()) / 3.0
 		
 	func center3d():
 		var points = points()
-		return (points[0].point3d() + points[1].point3d() + points[2].point3d()) / 3.0
+		var a = points[0].point2d()
+		var b = points[1].point2d()
+		var c = points[2].point2d()
+		var ad = a[0] * a[0] + a[1] * a[1]
+		var bd = b[0] * b[0] + b[1] * b[1]
+		var cd = c[0] * c[0] + c[1] * c[1]
+		var D = 2 * (a[0] * (b[1] - c[1]) + b[0] * (c[1] - a[1]) + c[0] * (a[1] - b[1]))
+
+		return Vector3(
+			1 / D * (ad * (b[1] - c[1]) + bd * (c[1] - a[1]) + cd * (a[1] - b[1])),
+			points[0].get_elevation(),
+			1 / D * (ad * (c[0] - b[0]) + bd * (a[0] - c[0]) + cd * (b[0] - a[0]))
+		)
+
+		# var center2d = center2d()
+		# return Vector3(center2d.x, )
+		# var points = points()
+		# return (points[0].point3d() + points[1].point3d() + points[2].point3d()) / 3.0
 	
 	func set_elevation(elevation:float):
 		for point in points():
@@ -573,7 +602,7 @@ func create(width:int, height:int, spacing:int, name:String):
 func _create_points():
 	var rect = Rect2(Vector2(0, 0), Vector2(_width, _height))
 	var poisson_disc_sampling: PoissonDiscSampling = PoissonDiscSampling.new()
-	var points2d = poisson_disc_sampling.generate_points(_spacing, rect, 5)
+	var points2d = poisson_disc_sampling.generate_points(_spacing, rect, 2)
 	_points.resize(points2d.size())
 	for point_idx in points2d.size():
 		_points[point_idx].x = points2d[point_idx].x

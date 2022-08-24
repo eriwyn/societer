@@ -4,11 +4,11 @@ class_name WorldGeneration
 
 export(int) var width = 2048
 export(int) var height = 2048
-export(int) var spacing = 20
+export(int) var spacing = 10
 export(int, 1, 9) var octaves = 5
 export(int, 1, 30) var wavelength = 8
 export(int) var border_width = 200
-export(int) var terraces = 30
+export(int) var terraces = 100
 export(int) var terrace_height = 5
 export(float) var mountain_height = 6.0 / 24.0
 export(int) var river_proba = 200
