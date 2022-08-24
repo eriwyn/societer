@@ -8,7 +8,7 @@ export(int) var spacing = 20
 export(int, 1, 9) var octaves = 5
 export(int, 1, 30) var wavelength = 8
 export(int) var border_width = 200
-export(int) var terraces = 10
+export(int) var terraces = 30
 export(int) var terrace_height = 5
 export(float) var mountain_height = 6.0 / 24.0
 export(int) var river_proba = 200
@@ -28,13 +28,13 @@ func _init():
 		Global.terrain.create(width,height,spacing,Global.terrain_name)
 	
 	var max_step = (
-		Global.terrain.get_triangles().size()
-		# + height
+		# Global.terrain.get_triangles().size()
+		Global.terrain.get_points().size()
 	)
 
 	if Global.terrain.is_created():
 		max_step += Global.terrain.get_points().size()
-		max_step += Global.terrain.get_triangles().size()
+		max_step += Global.terrain.get_centers().size()
 		Global.loading.set_step(Global.terrain.get_points().size())
 
 	Global.loading.set_max_step(max_step)
@@ -44,8 +44,8 @@ func _init():
 		Global.terrain.save()
 		
 	if Global.terrain.is_created() or Global.terrain.is_loaded():
-		Global.terrain.set_data("mesh", create_mesh())
 		# create_map()
+		Global.terrain.set_data("mesh", create_mesh())
 		# add_trees()
 		# get_tree().change_scene("res://world/game.tscn")
 	else:
@@ -71,16 +71,31 @@ func init_data():
 	# 	point.set_data("coast", point_is_coast(point))
 	# 	if point.get_data("river"):
 	# 		set_river_path(point)
-	for triangle in Global.terrain.get_triangles():
-		triangle.set_elevation(find_elevation(triangle.center2d()))
-		# triangle.set_data("elevation", triangle_find_elevation(triangle))
-		triangle.set_data("water", triangle_is_water(triangle))
-		if not triangle.get_data("water"):
-			if triangle.get_elevation() < 0:
-				print(triangle.get_elevation())
-		if triangle.is_water():
-			triangle.set_elevation(0)
+	# print("a")
+	for center in Global.terrain.get_centers():
+		center.set_elevation(find_elevation(center.point2d()))
+		if center.get_elevation() <= 0:
+			center.set_data("water", true)
+		# print(center.get_elevation())
 		Global.loading.increment_step()
+	# print(Global.terrain.get_centers().size())
+
+	print("first center : %f" % Global.terrain.get_centers()[0])
+	# for center in Global.terrain.get_centers():
+	# 	print("z")
+	# 	center.set_elevation(find_elevation(center.point2d))
+	# 	Global.loading.increment_step()
+	# 	print(center.get_elevation())
+	# for triangle in Global.terrain.get_triangles():
+	# 	triangle.set_elevation(find_elevation(triangle.center2d()))
+	# 	# triangle.set_data("elevation", triangle_find_elevation(triangle))
+	# 	triangle.set_data("water", triangle_is_water(triangle))
+	# 	if not triangle.get_data("water"):
+	# 		if triangle.get_elevation() < 0:
+	# 			print(triangle.get_elevation())
+	# 	if triangle.is_water():
+	# 		triangle.set_elevation(0)
+	# 	Global.loading.increment_step()
 	# 	triangle.set_data("ocean", false)
 	# 	for point in triangle.points():
 	# 		if point.get_data("ocean"):
@@ -228,27 +243,53 @@ func create_mesh():
 	var st = SurfaceTool.new()
 
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
-	for triangle in Global.terrain.get_triangles():
-		if not triangle.is_water():
-			if triangle.get_elevation() < 0:
-				print(triangle.get_elevation())
-			var factor = Vector3(1, 120, 1)
-			for edge in triangle.edges():
-				if triangle.get_elevation() > edge.opposite_triangle().get_elevation():
-					st.add_vertex(Vector3(edge.start().point3d().x, triangle.get_elevation(), edge.start().point3d().z) * factor)
-					st.add_vertex(Vector3(edge.end().point3d().x, triangle.get_elevation(), edge.end().point3d().z) * factor)
-					st.add_vertex(Vector3(edge.start().point3d().x, edge.opposite_triangle().get_elevation(), edge.start().point3d().z) * factor)
+	# for triangle in Global.terrain.get_triangles():
+	# 	if not triangle.is_water():
+	# 		if triangle.get_elevation() < 0:
+	# 			print(triangle.get_elevation())
+	# 		var factor = Vector3(1, 120, 1)
+	# 		for edge in triangle.edges():
+	# 			if triangle.get_elevation() > edge.opposite_triangle().get_elevation():
+	# 				st.add_vertex(Vector3(edge.start().point3d().x, triangle.get_elevation(), edge.start().point3d().z) * factor)
+	# 				st.add_vertex(Vector3(edge.end().point3d().x, triangle.get_elevation(), edge.end().point3d().z) * factor)
+	# 				st.add_vertex(Vector3(edge.start().point3d().x, edge.opposite_triangle().get_elevation(), edge.start().point3d().z) * factor)
 					
-					st.add_vertex(Vector3(edge.end().point3d().x, triangle.get_elevation(), edge.end().point3d().z) * factor)
-					st.add_vertex(Vector3(edge.end().point3d().x, edge.opposite_triangle().get_elevation(), edge.end().point3d().z) * factor)
-					st.add_vertex(Vector3(edge.start().point3d().x, edge.opposite_triangle().get_elevation(), edge.start().point3d().z) * factor)
+	# 				st.add_vertex(Vector3(edge.end().point3d().x, triangle.get_elevation(), edge.end().point3d().z) * factor)
+	# 				st.add_vertex(Vector3(edge.end().point3d().x, edge.opposite_triangle().get_elevation(), edge.end().point3d().z) * factor)
+	# 				st.add_vertex(Vector3(edge.start().point3d().x, edge.opposite_triangle().get_elevation(), edge.start().point3d().z) * factor)
 						
-			for point in triangle.points():
-				st.add_vertex(Vector3(point.point3d().x, triangle.get_elevation(), point.point3d().z) * factor)
+	# 		for point in triangle.points():
+	# 			st.add_vertex(Vector3(point.point3d().x, triangle.get_elevation(), point.point3d().z) * factor)
+	# 	Global.loading.increment_step()
+
+
+	var factor = Vector3(1, 120, 1)
+	for center in Global.terrain.get_centers():
+		if not center.get_data("water"):
+			for edge in center.borders():
+				if edge.end_center().get_elevation() < edge.start_center().get_elevation():
+					st.add_vertex(Vector3(edge.start_corner().point3d().x, edge.end_center().get_elevation(), edge.start_corner().point3d().z) * factor)
+					st.add_vertex(Vector3(edge.end_corner().point3d().x, edge.start_center().get_elevation(), edge.end_corner().point3d().z) * factor)
+					st.add_vertex(Vector3(edge.start_corner().point3d().x, edge.start_center().get_elevation(), edge.start_corner().point3d().z) * factor)
+					
+					st.add_vertex(Vector3(edge.start_corner().point3d().x, edge.end_center().get_elevation(), edge.start_corner().point3d().z) * factor)
+					st.add_vertex(Vector3(edge.end_corner().point3d().x, edge.end_center().get_elevation(), edge.end_corner().point3d().z) * factor)
+					st.add_vertex(Vector3(edge.end_corner().point3d().x, edge.start_center().get_elevation(), edge.end_corner().point3d().z) * factor)
+						
+			for corner_count in center.corners().size():
+				var current_corner = center.corners()[corner_count]
+				var next_corner
+				if corner_count < center.corners().size() - 1:
+					next_corner = center.corners()[corner_count+1]
+				else:
+					next_corner = center.corners()[0]
+
+				st.add_vertex(Vector3(current_corner.point2d().x, center.get_elevation(), current_corner.point2d().y) * factor)
+				st.add_vertex(Vector3(next_corner.point2d().x, center.get_elevation(), next_corner.point2d().y) * factor)
+				st.add_vertex(Vector3(center.point2d().x, center.get_elevation(), center.point2d().y) * factor)
 		Global.loading.increment_step()
 
 	st.generate_normals()
-	st.generate_tangents()
 	st.index()
 
 	var mi = MeshInstance.new()
@@ -261,14 +302,31 @@ func create_mesh():
 
 # Enregistrement de la map + intégration dans la génération du monde #32 
 
-func create_map():
-	var img = Image.new()
-	img.create(width, height, false, Image.FORMAT_RGBA8)
-	img.lock()
+# func create_map():
+# 	print("oui")
+# 	var viewport = Viewport.new()
+# 	viewport.size = Vector2(width, height)
+# 	var canvas = Node2D.new()
+# 	viewport.add_child(canvas)
+# 	canvas.draw_line(Vector2(0.0, 0.0), Vector2(1000.0, 1000.0), [Color("#5e4fa2"))
+# 	for center in Global.terrain.get_centers():
+# 		var colors = Gradient.new()
+# 		colors.add_point(0.999,  Color("#9e0142")) # red
+# 		colors.add_point(0.5,  Color("#dc865d")) # orange
+# 		colors.add_point(0.25,  Color("#fbf8b0")) # yellow
+# 		colors.add_point(0.0,  Color("#89cfa5")) # green
+# 		colors.add_point(-0.999,  Color("#5e4fa2")) # blue
+# 		var color = colors.interpolate(min(center.get_elevation() + 0.001, 0.999))
+# 		# color = Color.green
+# 		if center.get_data("water"):
+# 			# var factor = pow((center.get_elevation()+1.001), 10) / 5.0
+# 			color = Color("#5e4fa2")
+# 		if center.polygon().size() > 2:
+# 			canvas.draw_polygon(center.polygon(), PoolColorArray([color]))
+# 		Global.loading.increment_step()
 
-	for y in height:
-		Global.loading.increment_step()
-		for x in width:
-			img.set_pixel(x,y,Color(randf(), randf(), randf()))
-	
-	img.unlock()
+# 	var img = viewport.get_texture().get_data()
+# 	img.flip_y()
+# 	var err = img.save_png("user://terrain/heightmap.png")
+# 	print(err)
+# 	# print("non")

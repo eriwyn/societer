@@ -4,7 +4,7 @@ signal map_clicked
 
 func heightmap():
 	print (Global.terrain)
-	for triangle in Global.terrain.get_triangles():
+	for triangle in Global.terrain.get_centers():
 		var colors = Gradient.new()
 		colors.add_point(0.999,  Color("#9e0142")) # red
 		colors.add_point(0.5,  Color("#dc865d")) # orange
@@ -13,7 +13,7 @@ func heightmap():
 		colors.add_point(-0.999,  Color("#5e4fa2")) # blue
 		var color = colors.interpolate(min(triangle.get_elevation() + 0.001, 0.999))
 		# color = Color.green
-		if triangle.is_water():
+		if triangle.get_data("water"):
 			# var factor = pow((triangle.get_elevation()+1.001), 10) / 5.0
 			color = Color("#5e4fa2")
 		if triangle.polygon().size() > 2:
