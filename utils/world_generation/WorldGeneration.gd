@@ -56,6 +56,20 @@ func _init():
 	Global.loading.set_end_time()
 
 func init_data():
+	for center in Global.terrain.get_centers():
+		center.set_elevation(find_elevation(center.point2d()))
+		if center.get_elevation() <= 0.0:
+			center.set_data("water", true)
+		Global.loading.increment_step()
+
+	fill_oceans()
+	remove_holes()
+
+	for center in Global.terrain.get_centers():
+		center.set_data("coast", is_coast(center.to_point()))
+
+
+	
 	# for point in Global.terrain.get_points():
 		# point.set_elevation(point_find_elevation(point.point2d()))
 		# point.set_data("water", point_is_water(point))
@@ -72,15 +86,7 @@ func init_data():
 	# 	if point.get_data("river"):
 	# 		set_river_path(point)
 	# print("a")
-	for center in Global.terrain.get_centers():
-		center.set_elevation(find_elevation(center.point2d()))
-		if center.get_elevation() <= 0:
-			center.set_data("water", true)
-		# print(center.get_elevation())
-		Global.loading.increment_step()
-	# print(Global.terrain.get_centers().size())
-
-	print("first center : %f" % Global.terrain.get_centers()[0])
+	
 	# for center in Global.terrain.get_centers():
 	# 	print("z")
 	# 	center.set_elevation(find_elevation(center.point2d))
@@ -104,18 +110,7 @@ func init_data():
 	# 	edge.set_data("coast", edge_is_coast(edge))
 	# 	edge.set_data("river", edge_is_river(edge))
 
-func fill_oceans():
-	var stack = []
-	for point in Global.terrain.get_points():
-		if point.point2d().x < 10 and point.get_data("water") and not point.get_data("ocean"):
-			stack.append(point.get_index())
-			while stack.size():
-				var current_point_id = stack.pop_back()
-				Global.terrain.get_point(current_point_id).set_data("ocean", true)
-				for neighbour in Global.terrain.get_point(current_point_id).points_around():
-					if neighbour.get_data("water") and not neighbour.get_data("ocean"):
-						stack.append(neighbour.get_index())
-			break
+
 
 func set_river_path(point):
 	#TODO #2 fix rivers
@@ -153,30 +148,7 @@ func set_river_path(point):
 
 # Point
 
-func find_elevation(point):
 
-	# var border = border_width + rng.randf_range(-20.0, 20.0)
-	var elevation = noise.get_noise_2d(point.x / wavelength, point.y / wavelength)
-	
-	var nx = 2 * point.x / width - 1
-	var ny = 2 * point.y / height - 1
-
-	var radius = range_lerp(elevation, -1, 1, 0.8, 1.0)
-
-	var distance = 1 - (1-pow(nx, 2)) * (1-pow(ny,2))
-	distance = sqrt(pow(nx, 2) + pow(ny, 2))
-	if distance > radius:
-		elevation = (elevation - range_lerp(distance, radius, 1.0, 0.0, 1.0))
-		
-	elevation = max(elevation, -1)
-			
-	if elevation > 0.1:
-		elevation = max(pow((elevation) * 1.2, 1.5), 0.1)
-		
-	elevation = min(elevation, 1)
-		
-	elevation = round(elevation * terraces) / terraces
-	return elevation
 	
 func point_is_water(point):
 	if (point.get_elevation() < 0):
@@ -239,30 +211,79 @@ func edge_is_river(edge):
 # 				tree.translation = Vector3(triangle.center3d() * Vector3(1, 12*10, 1))
 # 				add_child(tree)
 
+
+
+
+
+
+
+
+
+
+
+func find_elevation(point):
+
+	# var border = border_width + rng.randf_range(-20.0, 20.0)
+	var elevation = noise.get_noise_2d(point.x / wavelength, point.y / wavelength)
+	
+	var nx = 2 * point.x / width - 1
+	var ny = 2 * point.y / height - 1
+
+	var radius = range_lerp(elevation, -1, 1, 0.8, 1.0)
+
+	var distance = 1 - (1-pow(nx, 2)) * (1-pow(ny,2))
+	distance = sqrt(pow(nx, 2) + pow(ny, 2))
+	if distance > radius:
+		elevation = (elevation - range_lerp(distance, radius, 1.0, 0.0, 1.0))
+		
+	elevation = max(elevation, -1)
+			
+	if elevation > 0.1:
+		elevation = max(pow((elevation) * 1.2, 1.5), 0.1)
+		
+	elevation = min(elevation, 1)
+		
+	elevation = round(elevation * terraces) / terraces
+	return elevation
+
+
+func fill_oceans():
+	var stack = []
+	var first_center = null
+	var i = 0.0
+	while not first_center:
+		first_center = Global.terrain.find_point(Vector2(i, i))
+		i += 1.0
+
+	stack.append(first_center.get_index())
+	while stack.size():
+		var current_point_id = stack.pop_back()
+		Global.terrain.get_point(current_point_id).set_data("ocean", true)
+		for neighbour in Global.terrain.get_point(current_point_id).points_around():
+			if neighbour.get_data("water") and not neighbour.get_data("ocean"):
+				stack.append(neighbour.get_index())
+
+func remove_holes():
+	for center in Global.terrain.get_centers():
+		if center.get_data("water") and not center.get_data("ocean"):
+			center.set_elevation(0.2)
+			center.set_data("water", false)
+
+func is_coast(point):
+	if not point.get_data("water"):
+		for neighbour in point.points_around():
+			if neighbour.get_data("ocean"):
+				return true
+	return false
+
+
+
+
+
 func create_mesh():
 	var st = SurfaceTool.new()
 
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
-	# for triangle in Global.terrain.get_triangles():
-	# 	if not triangle.is_water():
-	# 		if triangle.get_elevation() < 0:
-	# 			print(triangle.get_elevation())
-	# 		var factor = Vector3(1, 120, 1)
-	# 		for edge in triangle.edges():
-	# 			if triangle.get_elevation() > edge.opposite_triangle().get_elevation():
-	# 				st.add_vertex(Vector3(edge.start().point3d().x, triangle.get_elevation(), edge.start().point3d().z) * factor)
-	# 				st.add_vertex(Vector3(edge.end().point3d().x, triangle.get_elevation(), edge.end().point3d().z) * factor)
-	# 				st.add_vertex(Vector3(edge.start().point3d().x, edge.opposite_triangle().get_elevation(), edge.start().point3d().z) * factor)
-					
-	# 				st.add_vertex(Vector3(edge.end().point3d().x, triangle.get_elevation(), edge.end().point3d().z) * factor)
-	# 				st.add_vertex(Vector3(edge.end().point3d().x, edge.opposite_triangle().get_elevation(), edge.end().point3d().z) * factor)
-	# 				st.add_vertex(Vector3(edge.start().point3d().x, edge.opposite_triangle().get_elevation(), edge.start().point3d().z) * factor)
-						
-	# 		for point in triangle.points():
-	# 			st.add_vertex(Vector3(point.point3d().x, triangle.get_elevation(), point.point3d().z) * factor)
-	# 	Global.loading.increment_step()
-
-
 	var factor = Vector3(1, 120, 1)
 	for center in Global.terrain.get_centers():
 		if not center.get_data("water"):
