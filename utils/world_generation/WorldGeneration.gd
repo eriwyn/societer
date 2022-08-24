@@ -4,7 +4,7 @@ class_name WorldGeneration
 
 export(int) var width = 2048
 export(int) var height = 2048
-export(int) var spacing = 10
+export(int) var spacing = 20
 export(int, 1, 9) var octaves = 5
 export(int, 1, 30) var wavelength = 8
 export(int) var border_width = 200
@@ -67,6 +67,8 @@ func init_data():
 
 	for center in Global.terrain.get_centers():
 		center.set_data("coast", is_coast(center.to_point()))
+		# if center.get_data("ocean"):
+			# center.set_elevation(-1.0)
 
 
 	
@@ -289,13 +291,20 @@ func create_mesh():
 		if not center.get_data("water"):
 			for edge in center.borders():
 				if edge.end_center().get_elevation() < edge.start_center().get_elevation():
-					st.add_vertex(Vector3(edge.start_corner().point3d().x, edge.end_center().get_elevation(), edge.start_corner().point3d().z) * factor)
-					st.add_vertex(Vector3(edge.end_corner().point3d().x, edge.start_center().get_elevation(), edge.end_corner().point3d().z) * factor)
-					st.add_vertex(Vector3(edge.start_corner().point3d().x, edge.start_center().get_elevation(), edge.start_corner().point3d().z) * factor)
+					var top = edge.start_center().get_elevation()
+					# if edge.start_center().get_data("ocean"):
+						# top = -1.0
+					var bottom = edge.end_center().get_elevation()
+					if edge.end_center().get_data("ocean"):
+						bottom = 0.0
+
+					st.add_vertex(Vector3(edge.start_corner().point3d().x, bottom, edge.start_corner().point3d().z) * factor)
+					st.add_vertex(Vector3(edge.end_corner().point3d().x, top, edge.end_corner().point3d().z) * factor)
+					st.add_vertex(Vector3(edge.start_corner().point3d().x, top, edge.start_corner().point3d().z) * factor)
 					
-					st.add_vertex(Vector3(edge.start_corner().point3d().x, edge.end_center().get_elevation(), edge.start_corner().point3d().z) * factor)
-					st.add_vertex(Vector3(edge.end_corner().point3d().x, edge.end_center().get_elevation(), edge.end_corner().point3d().z) * factor)
-					st.add_vertex(Vector3(edge.end_corner().point3d().x, edge.start_center().get_elevation(), edge.end_corner().point3d().z) * factor)
+					st.add_vertex(Vector3(edge.start_corner().point3d().x, bottom, edge.start_corner().point3d().z) * factor)
+					st.add_vertex(Vector3(edge.end_corner().point3d().x, bottom, edge.end_corner().point3d().z) * factor)
+					st.add_vertex(Vector3(edge.end_corner().point3d().x, top, edge.end_corner().point3d().z) * factor)
 						
 			for corner_count in center.corners().size():
 				var current_corner = center.corners()[corner_count]
