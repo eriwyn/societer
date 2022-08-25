@@ -4,13 +4,13 @@ class_name WorldGeneration
 
 export(int) var width = 2048
 export(int) var height = 2048
-export(int) var spacing = 20
+export(int) var spacing = 5
 export(int, 1, 9) var octaves = 5
 export(int, 1, 30) var wavelength = 8
 export(int) var border_width = 200
 export(int) var terraces = 100
 export(int) var terrace_height = 5
-export(float) var mountain_height = 6.0 / 24.0
+export(float) var mountain_height = 10.0 / 24.0
 export(int) var river_proba = 200
 
 var rng = RandomNumberGenerator.new()
@@ -60,10 +60,12 @@ func init_data():
 		center.set_elevation(find_elevation(center.point2d()))
 		if center.get_elevation() <= 0.0:
 			center.set_data("water", true)
+		if center.get_elevation() >= mountain_height:
+			center.set_data("mountain", true)
 		Global.loading.increment_step()
 
 	fill_oceans()
-	remove_holes()
+	# remove_holes()
 
 	for center in Global.terrain.get_centers():
 		center.set_data("coast", is_coast(center.to_point()))
@@ -202,17 +204,6 @@ func edge_is_river(edge):
 		return true
 	return false
 
-# func add_trees():
-# 	rng.randomize()
-# 	var treescene = load("res://entities/environment/birchtree/birchtree.tscn")
-# 	for triangle in Global.terrain.get_triangles():
-# 		if not triangle.get_data("water"):
-# 			var num = rng.randi_range(0, 5)
-# 			if num == 1:
-# 				var tree = treescene.instance()
-# 				tree.translation = Vector3(triangle.center3d() * Vector3(1, 12*10, 1))
-# 				add_child(tree)
-
 
 
 
@@ -231,7 +222,7 @@ func find_elevation(point):
 	var nx = 2 * point.x / width - 1
 	var ny = 2 * point.y / height - 1
 
-	var radius = range_lerp(elevation, -1, 1, 0.8, 1.0)
+	var radius = range_lerp(elevation, -1, 1, 0.8, 0.9)
 
 	var distance = 1 - (1-pow(nx, 2)) * (1-pow(ny,2))
 	distance = sqrt(pow(nx, 2) + pow(ny, 2))
@@ -289,6 +280,15 @@ func create_mesh():
 	var factor = Vector3(1, 120, 1)
 	for center in Global.terrain.get_centers():
 		if not center.get_data("water"):
+			var top_uv = Vector2(0, 0)
+			var border_uv = Vector2(1, 0)
+			if center.get_data("mountain"):
+				top_uv = Vector2(1, 0.5)
+				border_uv = Vector2(1, 0.5)
+			if center.get_data("coast"):
+				top_uv = Vector2(1, 1)
+				border_uv = Vector2(1, 1)
+
 			for edge in center.borders():
 				if edge.end_center().get_elevation() < edge.start_center().get_elevation():
 					var top = edge.start_center().get_elevation()
@@ -297,7 +297,7 @@ func create_mesh():
 					var bottom = edge.end_center().get_elevation()
 					if edge.end_center().get_data("ocean"):
 						bottom = 0.0
-
+					st.add_uv(border_uv)
 					st.add_vertex(Vector3(edge.start_corner().point3d().x, bottom, edge.start_corner().point3d().z) * factor)
 					st.add_vertex(Vector3(edge.end_corner().point3d().x, top, edge.end_corner().point3d().z) * factor)
 					st.add_vertex(Vector3(edge.start_corner().point3d().x, top, edge.start_corner().point3d().z) * factor)
@@ -305,7 +305,7 @@ func create_mesh():
 					st.add_vertex(Vector3(edge.start_corner().point3d().x, bottom, edge.start_corner().point3d().z) * factor)
 					st.add_vertex(Vector3(edge.end_corner().point3d().x, bottom, edge.end_corner().point3d().z) * factor)
 					st.add_vertex(Vector3(edge.end_corner().point3d().x, top, edge.end_corner().point3d().z) * factor)
-						
+
 			for corner_count in center.corners().size():
 				var current_corner = center.corners()[corner_count]
 				var next_corner
@@ -314,6 +314,7 @@ func create_mesh():
 				else:
 					next_corner = center.corners()[0]
 
+				st.add_uv(Vector2(top_uv))
 				st.add_vertex(Vector3(current_corner.point2d().x, center.get_elevation(), current_corner.point2d().y) * factor)
 				st.add_vertex(Vector3(next_corner.point2d().x, center.get_elevation(), next_corner.point2d().y) * factor)
 				st.add_vertex(Vector3(center.point2d().x, center.get_elevation(), center.point2d().y) * factor)
