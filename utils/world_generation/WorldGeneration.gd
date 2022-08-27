@@ -4,7 +4,7 @@ class_name WorldGeneration
 
 export(int) var width = 2048
 export(int) var height = 2048
-export(int) var spacing = 5
+export(int) var spacing = 40
 export(int, 1, 9) var octaves = 5
 export(int, 1, 30) var wavelength = 8
 export(int) var border_width = 200
@@ -71,6 +71,12 @@ func init_data():
 		center.set_data("coast", is_coast(center.to_point()))
 		# if center.get_data("ocean"):
 			# center.set_elevation(-1.0)
+		
+		center.set_data("material", "grass")
+		if center.get_data("mountain"):
+			center.set_data("material", "stone")
+		if center.get_data("coast"):
+			center.set_data("material", "sand")
 
 
 	
@@ -236,7 +242,7 @@ func find_elevation(point):
 		
 	elevation = min(elevation, 1)
 		
-	elevation = round(elevation * terraces) / terraces
+	elevation = (elevation * terraces) / terraces
 	return elevation
 
 
@@ -274,20 +280,19 @@ func is_coast(point):
 
 
 func create_mesh():
+	var file = File.new()
+	file.open("res://world/materials/materials.json", File.READ)
+	var materials = JSON.parse(file.get_as_text()).result
+
 	var st = SurfaceTool.new()
 
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
 	var factor = Vector3(1, 120, 1)
 	for center in Global.terrain.get_centers():
 		if not center.get_data("water"):
-			var top_uv = Vector2(0, 0)
-			var border_uv = Vector2(1, 0)
-			if center.get_data("mountain"):
-				top_uv = Vector2(1, 0.5)
-				border_uv = Vector2(1, 0.5)
-			if center.get_data("coast"):
-				top_uv = Vector2(1, 1)
-				border_uv = Vector2(1, 1)
+			var material_id = materials[center.get_data("material")]
+			var top_uv = Vector2(0, float(material_id) / (materials.size()-1))
+			var border_uv = Vector2(1, float(material_id) / (materials.size()-1))
 
 			for edge in center.borders():
 				if edge.end_center().get_elevation() < edge.start_center().get_elevation():
@@ -325,7 +330,7 @@ func create_mesh():
 
 	var mi = MeshInstance.new()
 	mi.mesh = st.commit()
-	var material = load("res://world/world.material")
+	var material = load("res://world/materials/world.material")
 	mi.set_surface_material(0, material)
 	mi.create_trimesh_collision()
 	mi.cast_shadow = GeometryInstance.SHADOW_CASTING_SETTING_ON
