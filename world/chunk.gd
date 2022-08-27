@@ -5,6 +5,7 @@ var noise
 var should_remove = true
 var x
 var z
+var empty = true
 
 func _init(x, z):
 	self.x = x
@@ -12,7 +13,7 @@ func _init(x, z):
 
 func _ready():
 	generate_chunk()
-	
+	pass
 func generate_chunk():
 	var file = File.new()
 	file.open("res://world/materials/materials.json", File.READ)
@@ -22,8 +23,13 @@ func generate_chunk():
 
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
 	var factor = Vector3(1, 120, 1)
+	# print(x)
+	# print(z)
 	for center in Global.terrain.get_chunk(Vector2(x, z)):
+		# print(center.get_data("water"))
 		if not center.get_data("water"):
+			empty = false
+			# print(center.get_data("material"))
 			var material_id = materials[center.get_data("material")]
 			var top_uv = Vector2(0, float(material_id) / (materials.size()-1))
 			var border_uv = Vector2(1, float(material_id) / (materials.size()-1))
@@ -59,13 +65,14 @@ func generate_chunk():
 				st.add_vertex(Vector3(center.point2d().x, center.get_elevation(), center.point2d().y) * factor)
 		Global.loading.increment_step()
 
-	st.generate_normals()
-	st.index()
+	if not empty:
+		st.generate_normals()
+		st.index()
 
-	var mi = MeshInstance.new()
-	mi.mesh = st.commit()
-	var material = load("res://world/materials/world.material")
-	mi.set_surface_material(0, material)
-	mi.create_trimesh_collision()
-	mi.cast_shadow = GeometryInstance.SHADOW_CASTING_SETTING_ON
-	add_child(mi)
+		var mi = MeshInstance.new()
+		mi.mesh = st.commit()
+		var material = load("res://world/materials/world.material")
+		mi.set_surface_material(0, material)
+		mi.create_trimesh_collision()
+		mi.cast_shadow = GeometryInstance.SHADOW_CASTING_SETTING_ON
+		add_child(mi)

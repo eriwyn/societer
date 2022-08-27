@@ -1,8 +1,8 @@
 extends Spatial
 
 var rng = RandomNumberGenerator.new()
-var chunk_size = 16
-var chunk_amount = 16
+var chunk_size = 32
+var chunk_amount = 4
 var chunks = {}
 var unready_chunks = {}
 var thread
@@ -46,10 +46,13 @@ func load_chunk(array):
 	var thread = array[0]
 	var x = array[1]
 	var z = array[2]
+
+	# print(x)
+	# print(z)
 	
 	var chunk = Chunk.new(x * chunk_size, z * chunk_size)
 		
-	chunk.translation = Vector3(x * chunk_size, 0, z * chunk_size)
+	# chunk.translation = Vector3(x * chunk_size, 0, z * chunk_size)
 	
 	call_deferred("load_done", chunk, thread)
 	
@@ -74,9 +77,9 @@ func _process(delta):
 
 func update_chunks():
 	var camera_translation = $CamBase/Camera.translation
-#	print(camera_translation)
+	# print(camera_translation)
 	var c_x = int(camera_translation.x) / chunk_size
-	var c_z = int(camera_translation.z) / chunk_size
+	var c_z = int(camera_translation.y) / chunk_size * -1
 	
 	for x in range(c_x - chunk_amount * 0.5, c_x + chunk_amount * 0.53):
 		for z in range(c_z - chunk_amount * 0.5, c_z + chunk_amount * 0.53):

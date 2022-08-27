@@ -4,7 +4,7 @@ class_name WorldGeneration
 
 export(int) var width = 2048
 export(int) var height = 2048
-export(int) var spacing = 40
+export(int) var spacing = 5
 export(int, 1, 9) var octaves = 5
 export(int, 1, 30) var wavelength = 8
 export(int) var border_width = 200
@@ -289,41 +289,46 @@ func create_mesh():
 
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
 	var factor = Vector3(1, 120, 1)
-	for center in Global.terrain.get_centers():
-		if not center.get_data("water"):
-			var material_id = materials[center.get_data("material")]
-			var top_uv = Vector2(0, float(material_id) / (materials.size()-1))
-			var border_uv = Vector2(1, float(material_id) / (materials.size()-1))
+	# for center in Global.terrain.get_centers():
+	for i in range(1, 2048):
+		for j in range(1, 2048):
+			for center in Global.terrain.get_chunk(Vector2(i, j)):
+				# print(center.get_data("water"))
+				if not center.get_data("water"):
+					# print(center.get_data("material"))
+					var material_id = materials[center.get_data("material")]
+					var top_uv = Vector2(0, float(material_id) / (materials.size()-1))
+					var border_uv = Vector2(1, float(material_id) / (materials.size()-1))
 
-			for edge in center.borders():
-				if edge.end_center().get_elevation() < edge.start_center().get_elevation():
-					var top = edge.start_center().get_elevation()
-					# if edge.start_center().get_data("ocean"):
-						# top = -1.0
-					var bottom = edge.end_center().get_elevation()
-					if edge.end_center().get_data("ocean"):
-						bottom = 0.0
-					st.add_uv(border_uv)
-					st.add_vertex(Vector3(edge.start_corner().point3d().x, bottom, edge.start_corner().point3d().z) * factor)
-					st.add_vertex(Vector3(edge.end_corner().point3d().x, top, edge.end_corner().point3d().z) * factor)
-					st.add_vertex(Vector3(edge.start_corner().point3d().x, top, edge.start_corner().point3d().z) * factor)
-					
-					st.add_vertex(Vector3(edge.start_corner().point3d().x, bottom, edge.start_corner().point3d().z) * factor)
-					st.add_vertex(Vector3(edge.end_corner().point3d().x, bottom, edge.end_corner().point3d().z) * factor)
-					st.add_vertex(Vector3(edge.end_corner().point3d().x, top, edge.end_corner().point3d().z) * factor)
+					for edge in center.borders():
+						if edge.end_center().get_elevation() < edge.start_center().get_elevation():
+							var top = edge.start_center().get_elevation()
+							# if edge.start_center().get_data("ocean"):
+								# top = -1.0
+							var bottom = edge.end_center().get_elevation()
+							if edge.end_center().get_data("ocean"):
+								bottom = 0.0
+							st.add_uv(border_uv)
+							st.add_vertex(Vector3(edge.start_corner().point3d().x, bottom, edge.start_corner().point3d().z) * factor)
+							st.add_vertex(Vector3(edge.end_corner().point3d().x, top, edge.end_corner().point3d().z) * factor)
+							st.add_vertex(Vector3(edge.start_corner().point3d().x, top, edge.start_corner().point3d().z) * factor)
+							
+							st.add_vertex(Vector3(edge.start_corner().point3d().x, bottom, edge.start_corner().point3d().z) * factor)
+							st.add_vertex(Vector3(edge.end_corner().point3d().x, bottom, edge.end_corner().point3d().z) * factor)
+							st.add_vertex(Vector3(edge.end_corner().point3d().x, top, edge.end_corner().point3d().z) * factor)
 
-			for corner_count in center.corners().size():
-				var current_corner = center.corners()[corner_count]
-				var next_corner
-				if corner_count < center.corners().size() - 1:
-					next_corner = center.corners()[corner_count+1]
-				else:
-					next_corner = center.corners()[0]
+					for corner_count in center.corners().size():
+						var current_corner = center.corners()[corner_count]
+						var next_corner
+						if corner_count < center.corners().size() - 1:
+							next_corner = center.corners()[corner_count+1]
+						else:
+							next_corner = center.corners()[0]
 
-				st.add_uv(Vector2(top_uv))
-				st.add_vertex(Vector3(current_corner.point2d().x, center.get_elevation(), current_corner.point2d().y) * factor)
-				st.add_vertex(Vector3(next_corner.point2d().x, center.get_elevation(), next_corner.point2d().y) * factor)
-				st.add_vertex(Vector3(center.point2d().x, center.get_elevation(), center.point2d().y) * factor)
+						st.add_uv(Vector2(top_uv))
+						st.add_vertex(Vector3(current_corner.point2d().x, center.get_elevation(), current_corner.point2d().y) * factor)
+						st.add_vertex(Vector3(next_corner.point2d().x, center.get_elevation(), next_corner.point2d().y) * factor)
+						st.add_vertex(Vector3(center.point2d().x, center.get_elevation(), center.point2d().y) * factor)
 		Global.loading.increment_step()
 
 	st.generate_normals()

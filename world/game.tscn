@@ -176,7 +176,7 @@ fov = 55.0
 depth_threshold = 0.001
 depth_multiplier = 999.0
 zoom_sensibility = 1.436
-height = 6.596
+height = 5.0
 
 [node name="DirectionalLight" type="DirectionalLight" parent="World3d"]
 transform = Transform( 0.971628, 0.168947, -0.16552, 0, 0.699825, 0.714314, 0.236516, -0.694047, 0.67997, 0, 1.41623, 14.8745 )
