@@ -44,8 +44,9 @@ func _init():
 		Global.terrain.save()
 		
 	if Global.terrain.is_created() or Global.terrain.is_loaded():
+		pass
 		# create_map()
-		Global.terrain.set_data("mesh", create_mesh())
+		# Global.terrain.set_data("mesh", create_mesh())
 		# add_trees()
 		# get_tree().change_scene("res://world/game.tscn")
 	else:

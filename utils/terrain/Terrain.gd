@@ -850,3 +850,8 @@ func get_voronoi_cells_as_polygon():
 		list_polygon.append(center.polygon())
 	return(list_polygon)
 			
+func get_chunk(vect):
+	var centers = []
+	for idx in _data["find_point"][int(vect[0] / 64.0) * 32 + int(vect[1] / 64.0)]:
+		centers.append(get_center(idx))
+	return centers
