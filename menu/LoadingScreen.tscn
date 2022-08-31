@@ -125,6 +125,7 @@ alignment = 1
 margin_top = 99.0
 margin_right = 670.0
 margin_bottom = 151.0
+custom_constants/separation = 20
 
 [node name="TextureRect" type="TextureRect" parent="VBoxContainer/HBoxContainer"]
 margin_right = 57.0
@@ -132,12 +133,13 @@ margin_bottom = 52.0
 texture = SubResource( 4 )
 
 [node name="Phase" type="Label" parent="VBoxContainer/HBoxContainer"]
-margin_left = 61.0
+margin_left = 77.0
 margin_top = 5.0
-margin_right = 61.0
+margin_right = 248.0
 margin_bottom = 46.0
 theme = ExtResource( 2 )
 custom_fonts/font = SubResource( 2 )
+text = "azeazeaze"
 
 [node name="ProgressBar" type="ProgressBar" parent="VBoxContainer"]
 margin_top = 155.0
