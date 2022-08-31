@@ -4,69 +4,61 @@ class_name WorldGeneration
 
 export(int) var width = 2048
 export(int) var height = 2048
-export(int) var spacing = 40
+export(int) var spacing = 5
 export(int, 1, 9) var octaves = 5
 export(int, 1, 30) var wavelength = 8
 export(int) var border_width = 200
 export(int) var terraces = 100
 export(int) var terrace_height = 5
-export(float) var mountain_height = 10.0 / 24.0
+export(float) var mountain_height = 0.3
 export(int) var river_proba = 200
 
 var rng = RandomNumberGenerator.new()
 var noise = OpenSimplexNoise.new()
 
 func _init():
-	Global.loading.reset()
 	rng.randomize()
 	noise.seed = rng.randi()
 	noise.octaves = octaves
 	
 	if Global.terrain.exists(Global.terrain_name):
+		var coeffs = [1]
+		Global.loadings["world_creation"].start(coeffs, "Chargement...", 100)
 		Global.terrain.load(Global.terrain_name)
 	else:
+		var coeffs = [0, 1, 2, 2, 2, 2, 2, 8]
+		Global.loadings["world_creation"].start(coeffs, "Start", 100)
 		Global.terrain.create(width,height,spacing,Global.terrain_name)
-	
-	var max_step = (
-		# Global.terrain.get_triangles().size()
-		Global.terrain.get_points().size()
-	)
-
-	if Global.terrain.is_created():
-		max_step += Global.terrain.get_points().size()
-		max_step += Global.terrain.get_centers().size()
-		Global.loading.set_step(Global.terrain.get_points().size())
-
-	Global.loading.set_max_step(max_step)
 
 	if Global.terrain.is_created():
 		init_data()
+		Global.terrain.reset_temp_data()
 		Global.terrain.save()
-		
-	if Global.terrain.is_created() or Global.terrain.is_loaded():
-		# create_map()
-		Global.terrain.set_data("mesh", create_mesh())
-		# add_trees()
-		# get_tree().change_scene("res://world/game.tscn")
-	else:
-		Global.print_debug("Pas de Global.terrain, pas de construction ...")
-		Global.print_debug("Pas de construction ..., pas de palais ...")
-		Global.print_debug("Pas de palais ..., pas de palais.")
+		var terrain_mesh = TerrainMesh.new()
+		Global.terrain.set_temp_data("mesh", terrain_mesh.create_mesh())
 
-	Global.loading.set_end_time()
+	if Global.terrain.is_loaded():
+		var terrain_mesh = TerrainMesh.new()
+		Global.terrain.set_temp_data("mesh", terrain_mesh.load_mesh())
+	
+	Global.loadings["world_creation"].stop()
 
 func init_data():
+	Global.loadings["world_creation"].new_phase("Generation des continents...", Global.terrain.get_centers().size())
 	for center in Global.terrain.get_centers():
 		center.set_elevation(find_elevation(center.point2d()))
 		if center.get_elevation() <= 0.0:
 			center.set_data("water", true)
 		if center.get_elevation() >= mountain_height:
 			center.set_data("mountain", true)
-		Global.loading.increment_step()
 
+		Global.loadings["world_creation"].increment_step()
+
+	Global.loadings["world_creation"].new_phase("Remplissage des oceans...", 1)
 	fill_oceans()
 	# remove_holes()
 
+	Global.loadings["world_creation"].new_phase("Generation des biomes...", Global.terrain.get_centers().size())
 	for center in Global.terrain.get_centers():
 		center.set_data("coast", is_coast(center.to_point()))
 		# if center.get_data("ocean"):
@@ -77,6 +69,7 @@ func init_data():
 			center.set_data("material", "stone")
 		if center.get_data("coast"):
 			center.set_data("material", "sand")
+		Global.loadings["world_creation"].increment_step()
 
 
 	
@@ -277,64 +270,6 @@ func is_coast(point):
 
 
 
-
-
-func create_mesh():
-	var file = File.new()
-	file.open("res://world/materials/materials.json", File.READ)
-	var materials = JSON.parse(file.get_as_text()).result
-
-	var st = SurfaceTool.new()
-
-	st.begin(Mesh.PRIMITIVE_TRIANGLES)
-	var factor = Vector3(1, 120, 1)
-	for center in Global.terrain.get_centers():
-		if not center.get_data("water"):
-			var material_id = materials[center.get_data("material")]
-			var top_uv = Vector2(0, float(material_id) / (materials.size()-1))
-			var border_uv = Vector2(1, float(material_id) / (materials.size()-1))
-
-			for edge in center.borders():
-				if edge.end_center().get_elevation() < edge.start_center().get_elevation():
-					var top = edge.start_center().get_elevation()
-					# if edge.start_center().get_data("ocean"):
-						# top = -1.0
-					var bottom = edge.end_center().get_elevation()
-					if edge.end_center().get_data("ocean"):
-						bottom = 0.0
-					st.add_uv(border_uv)
-					st.add_vertex(Vector3(edge.start_corner().point3d().x, bottom, edge.start_corner().point3d().z) * factor)
-					st.add_vertex(Vector3(edge.end_corner().point3d().x, top, edge.end_corner().point3d().z) * factor)
-					st.add_vertex(Vector3(edge.start_corner().point3d().x, top, edge.start_corner().point3d().z) * factor)
-					
-					st.add_vertex(Vector3(edge.start_corner().point3d().x, bottom, edge.start_corner().point3d().z) * factor)
-					st.add_vertex(Vector3(edge.end_corner().point3d().x, bottom, edge.end_corner().point3d().z) * factor)
-					st.add_vertex(Vector3(edge.end_corner().point3d().x, top, edge.end_corner().point3d().z) * factor)
-
-			for corner_count in center.corners().size():
-				var current_corner = center.corners()[corner_count]
-				var next_corner
-				if corner_count < center.corners().size() - 1:
-					next_corner = center.corners()[corner_count+1]
-				else:
-					next_corner = center.corners()[0]
-
-				st.add_uv(Vector2(top_uv))
-				st.add_vertex(Vector3(current_corner.point2d().x, center.get_elevation(), current_corner.point2d().y) * factor)
-				st.add_vertex(Vector3(next_corner.point2d().x, center.get_elevation(), next_corner.point2d().y) * factor)
-				st.add_vertex(Vector3(center.point2d().x, center.get_elevation(), center.point2d().y) * factor)
-		Global.loading.increment_step()
-
-	st.generate_normals()
-	st.index()
-
-	var mi = MeshInstance.new()
-	mi.mesh = st.commit()
-	var material = load("res://world/materials/world.material")
-	mi.set_surface_material(0, material)
-	mi.create_trimesh_collision()
-	mi.cast_shadow = GeometryInstance.SHADOW_CASTING_SETTING_ON
-	return mi
 
 # Enregistrement de la map + intégration dans la génération du monde #32 
 

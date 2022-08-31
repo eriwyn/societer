@@ -1,11 +1,27 @@
 extends Spatial
 
 var rng = RandomNumberGenerator.new()
+var chunk_size = 32
+var chunk_amount = 16
+var chunks = {}
+var unready_chunks = {}
+var thread
 
 func _ready():
-	var mi = Global.terrain.get_data("mesh")
-	add_child(mi)
+	add_world()
 	add_trees()
+
+func add_world():
+	var terrain_mesh = TerrainMesh.new()
+	terrain_mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, Global.terrain.get_temp_data("mesh"))
+	terrain_mesh.surface_set_material(0, load("res://world/materials/world.material"))
+
+	var mi := MeshInstance.new()
+	mi.mesh = terrain_mesh
+	mi.create_trimesh_collision()
+
+	add_child(mi)
+	Global.terrain.reset_temp_data()
 
 func add_trees():
 	rng.randomize()
@@ -18,7 +34,6 @@ func add_trees():
 			if num == 1:
 				var points2d = poisson_disc_sampling.generate_points(3, center.polygon(), 2)
 				for point in points2d:
-					# print(point)
 					var tree = treescene.instance()
 					var scaling = rng.randi_range(0.8, 1.2)
 					tree.scale = Vector3(scaling, scaling, scaling)

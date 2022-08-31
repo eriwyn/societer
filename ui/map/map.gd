@@ -4,7 +4,8 @@ signal map_clicked
 
 func heightmap():
 	draw_rect(Rect2(Vector2(0, 0), Vector2(2048, 2048)), Color("#0e88bd"))
-	print (Global.terrain)
+	var coastline = PoolVector2Array()
+
 	for center in Global.terrain.get_centers():
 		if not center.get_data("ocean"):
 			var colors = Gradient.new()
@@ -23,13 +24,12 @@ func heightmap():
 			if center.polygon().size() > 2:
 				draw_polygon(center.polygon(), PoolColorArray([color]))
 
-	var coastline = PoolVector2Array()
-	for center in Global.terrain.get_centers():
-		if center.get_data("coast"):
-			for border in center.borders():
-				if (border.end_center().get_data("ocean")):
-					coastline.append(border.line()[0])
-					coastline.append(border.line()[1])
+			if center.get_data("coast"):
+				for border in center.borders():
+					if (border.end_center().get_data("ocean")):
+						coastline.append(border.line()[0])
+						coastline.append(border.line()[1])
+		
 	# for edge in Global.terrain.get_edges():
 	# 	if edge.get_data("coast"):
 			
@@ -95,7 +95,6 @@ func draw_voronoi_cells_convex_hull():
 			draw_polygon(voronoi_cell, PoolColorArray([color]))
 	
 func _draw():
-	print("before drawing")
 	heightmap()
 #	draw_voronoi_cells()
 #	draw_triangles_edges()

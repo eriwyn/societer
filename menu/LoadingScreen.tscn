@@ -1,18 +1,149 @@
-[gd_scene load_steps=2 format=2]
+[gd_scene load_steps=37 format=2]
 
 [ext_resource path="res://menu/LoadingScreen.gd" type="Script" id=1]
+[ext_resource path="res://theme/theme.tres" type="Theme" id=2]
+[ext_resource path="res://theme/fonts/monogram.ttf" type="DynamicFontData" id=3]
+[ext_resource path="res://menu/loading/frame-29.png" type="Texture" id=4]
+[ext_resource path="res://menu/loading/frame-11.png" type="Texture" id=5]
+[ext_resource path="res://menu/loading/frame-22.png" type="Texture" id=6]
+[ext_resource path="res://menu/loading/frame-1.png" type="Texture" id=7]
+[ext_resource path="res://menu/loading/frame-8.png" type="Texture" id=8]
+[ext_resource path="res://menu/loading/frame-24.png" type="Texture" id=9]
+[ext_resource path="res://menu/loading/frame-18.png" type="Texture" id=10]
+[ext_resource path="res://menu/loading/frame-25.png" type="Texture" id=11]
+[ext_resource path="res://menu/loading/frame-20.png" type="Texture" id=12]
+[ext_resource path="res://menu/loading/frame-27.png" type="Texture" id=13]
+[ext_resource path="res://menu/loading/frame-21.png" type="Texture" id=14]
+[ext_resource path="res://menu/loading/frame-10.png" type="Texture" id=15]
+[ext_resource path="res://menu/loading/frame-2.png" type="Texture" id=16]
+[ext_resource path="res://menu/loading/frame-13.png" type="Texture" id=17]
+[ext_resource path="res://menu/loading/frame-14.png" type="Texture" id=18]
+[ext_resource path="res://menu/loading/frame-16.png" type="Texture" id=19]
+[ext_resource path="res://menu/loading/frame-7.png" type="Texture" id=20]
+[ext_resource path="res://menu/loading/frame-23.png" type="Texture" id=21]
+[ext_resource path="res://menu/loading/frame-26.png" type="Texture" id=22]
+[ext_resource path="res://menu/loading/frame-5.png" type="Texture" id=23]
+[ext_resource path="res://menu/loading/frame-15.png" type="Texture" id=24]
+[ext_resource path="res://menu/loading/frame-9.png" type="Texture" id=25]
+[ext_resource path="res://menu/loading/frame-19.png" type="Texture" id=26]
+[ext_resource path="res://menu/loading/frame-17.png" type="Texture" id=27]
+[ext_resource path="res://menu/loading/frame-4.png" type="Texture" id=28]
+[ext_resource path="res://menu/loading/frame-6.png" type="Texture" id=29]
+[ext_resource path="res://menu/loading/frame-3.png" type="Texture" id=30]
+[ext_resource path="res://menu/loading/frame-28.png" type="Texture" id=31]
+[ext_resource path="res://menu/loading/frame-12.png" type="Texture" id=32]
+
+[sub_resource type="AnimatedTexture" id=4]
+flags = 4
+frames = 29
+fps = 30.0
+frame_0/texture = ExtResource( 7 )
+frame_1/texture = ExtResource( 16 )
+frame_1/delay_sec = 0.0
+frame_2/texture = ExtResource( 30 )
+frame_2/delay_sec = 0.0
+frame_3/texture = ExtResource( 28 )
+frame_3/delay_sec = 0.0
+frame_4/texture = ExtResource( 23 )
+frame_4/delay_sec = 0.0
+frame_5/texture = ExtResource( 29 )
+frame_5/delay_sec = 0.0
+frame_6/texture = ExtResource( 20 )
+frame_6/delay_sec = 0.0
+frame_7/texture = ExtResource( 8 )
+frame_7/delay_sec = 0.0
+frame_8/texture = ExtResource( 25 )
+frame_8/delay_sec = 0.0
+frame_9/texture = ExtResource( 15 )
+frame_9/delay_sec = 0.0
+frame_10/texture = ExtResource( 5 )
+frame_10/delay_sec = 0.0
+frame_11/texture = ExtResource( 32 )
+frame_11/delay_sec = 0.0
+frame_12/texture = ExtResource( 17 )
+frame_12/delay_sec = 0.0
+frame_13/texture = ExtResource( 18 )
+frame_13/delay_sec = 0.0
+frame_14/texture = ExtResource( 24 )
+frame_14/delay_sec = 0.0
+frame_15/texture = ExtResource( 19 )
+frame_15/delay_sec = 0.0
+frame_16/texture = ExtResource( 27 )
+frame_16/delay_sec = 0.0
+frame_17/texture = ExtResource( 10 )
+frame_17/delay_sec = 0.0
+frame_18/texture = ExtResource( 26 )
+frame_18/delay_sec = 0.0
+frame_19/texture = ExtResource( 12 )
+frame_19/delay_sec = 0.0
+frame_20/texture = ExtResource( 14 )
+frame_20/delay_sec = 0.0
+frame_21/texture = ExtResource( 6 )
+frame_21/delay_sec = 0.0
+frame_22/texture = ExtResource( 21 )
+frame_22/delay_sec = 0.0
+frame_23/texture = ExtResource( 9 )
+frame_23/delay_sec = 0.0
+frame_24/texture = ExtResource( 11 )
+frame_24/delay_sec = 0.0
+frame_25/texture = ExtResource( 22 )
+frame_25/delay_sec = 0.0
+frame_26/texture = ExtResource( 13 )
+frame_26/delay_sec = 0.0
+frame_27/texture = ExtResource( 31 )
+frame_27/delay_sec = 0.0
+frame_28/texture = ExtResource( 4 )
+frame_28/delay_sec = 0.0
+
+[sub_resource type="DynamicFont" id=2]
+size = 50
+font_data = ExtResource( 3 )
+
+[sub_resource type="DynamicFont" id=3]
+size = 36
+font_data = ExtResource( 3 )
+
+[sub_resource type="StyleBoxFlat" id=1]
 
 [node name="LoadingScreen" type="Control"]
 anchor_right = 1.0
 anchor_bottom = 1.0
 script = ExtResource( 1 )
 
-[node name="ProgressBar" type="ProgressBar" parent="."]
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-margin_left = -82.5
-margin_top = -7.0
-margin_right = 82.5
-margin_bottom = 7.0
+margin_left = -335.0
+margin_top = -142.0
+margin_right = 335.0
+margin_bottom = 142.0
+alignment = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
+margin_top = 99.0
+margin_right = 670.0
+margin_bottom = 151.0
+
+[node name="TextureRect" type="TextureRect" parent="VBoxContainer/HBoxContainer"]
+margin_right = 57.0
+margin_bottom = 52.0
+texture = SubResource( 4 )
+
+[node name="Phase" type="Label" parent="VBoxContainer/HBoxContainer"]
+margin_left = 61.0
+margin_top = 5.0
+margin_right = 61.0
+margin_bottom = 46.0
+theme = ExtResource( 2 )
+custom_fonts/font = SubResource( 2 )
+
+[node name="ProgressBar" type="ProgressBar" parent="VBoxContainer"]
+margin_top = 155.0
+margin_right = 670.0
+margin_bottom = 184.0
+custom_fonts/font = SubResource( 3 )
+custom_styles/fg = SubResource( 1 )
+min_value = 0.1
+value = 0.1

@@ -25,6 +25,11 @@ _global_script_classes=[ {
 "path": "res://addons/delaunator/Delaunator.gd"
 }, {
 "base": "Reference",
+"class": "LoadingHelper",
+"language": "GDScript",
+"path": "res://utils/loading/LoadingHelper.gd"
+}, {
+"base": "Reference",
 "class": "PoissonDiscSampling",
 "language": "GDScript",
 "path": "res://addons/PoissonDiscSampling/PoissonDiscSampling.gd"
@@ -33,6 +38,11 @@ _global_script_classes=[ {
 "class": "Terrain",
 "language": "GDScript",
 "path": "res://utils/terrain/Terrain.gd"
+}, {
+"base": "ArrayMesh",
+"class": "TerrainMesh",
+"language": "GDScript",
+"path": "res://utils/terrain_mesh/TerrainMesh.gd"
 }, {
 "base": "Reference",
 "class": "WorldGeneration",
@@ -43,8 +53,10 @@ _global_script_class_icons={
 "CameraController": "",
 "CameraOutline": "",
 "Delaunator": "",
+"LoadingHelper": "",
 "PoissonDiscSampling": "",
 "Terrain": "",
+"TerrainMesh": "",
 "WorldGeneration": ""
 }
 

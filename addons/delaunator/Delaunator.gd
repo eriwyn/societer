@@ -68,6 +68,7 @@ func _constructor():
 
 func update():
 	var n = coords.size() >> 1
+	Global.loadings["world_creation"].new_phase("Triangulation des points...", _ids.size())
 
 	# Populate an array of point indices; calculate input data bbox.
 	var min_x = INF
@@ -284,6 +285,7 @@ func update():
 		# Save the two new edges in the hash table.
 		_hull_hash[_hash_key(x, y)] = i
 		_hull_hash[_hash_key(coords[2 * e], coords[2 * e + 1])] = e
+		Global.loadings["world_creation"].increment_step()
 
 	hull.resize(hull_size)
 	var e = _hull_start
