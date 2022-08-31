@@ -173,8 +173,6 @@ material/0 = SubResource( 3 )
 physics_interpolation_mode = 1
 transform = Transform( 1, 0, 0, 0, 0.659983, -0.75128, 0, 0.75128, 0.659983, 0, -5.72205e-06, 6.618 )
 fov = 55.0
-depth_threshold = 0.001
-depth_multiplier = 999.0
 zoom_sensibility = 1.436
 height = 5.0
 

@@ -2,21 +2,23 @@ extends Control
 
 var thread
 var world = {}
-var old_step = 0
 
 func _ready():
 	thread = Thread.new()
 	thread.start(self, "_generate_world")
 	set_process(true)
-	Global.loading.set_start_time()
-
+	Global.loadings["world_creation"] = LoadingHelper.new()
+	
 func _process(_delta): 
-	$ProgressBar.value = Global.loading.get_percentage()
-	if (Global.loading.get_end_time() > 0):
-		
-		Global.print_debug("Elapsed time : %f seconds" % Global.loading.get_elapsed_time("s"))
+	$VBoxContainer/ProgressBar.value = Global.loadings["world_creation"].get_percentage()
+	if Global.loadings["world_creation"].get_current_phase():
+		$VBoxContainer/HBoxContainer/Phase.text = Global.loadings["world_creation"].get_current_phase().get_label()
+	if Global.loadings["world_creation"].is_finished:
+		for phase in Global.loadings["world_creation"].get_phases():
+			Global.print_debug("%s : %f seconds" % [phase.get_label(), phase.get_elapsed_time("s")])
+			
+		Global.print_debug("Elapsed time : %f seconds" % Global.loadings["world_creation"].get_elapsed_time("s"))
 		get_tree().change_scene("res://world/game.tscn")
-
 func _exit_tree():
 	thread.wait_to_finish()
 

@@ -58,7 +58,19 @@ class VoronoiCenter:
 		var data = _terrain._points_data[_idx]
 		if data.has(key):
 			return data[key]
-		
+
+	func has_temp_key(key):
+		return _terrain._points_temp_data[_idx].has(key)
+						
+	func set_temp_data(key,value):
+		var data = _terrain._points_temp_data[_idx]
+		data[key] = value
+				
+	func get_temp_data(key):
+		var data = _terrain._points_temp_data[_idx]
+		if data.has(key):
+			return data[key]
+
 	func point3d():
 		return _terrain._points[_idx]
 		
@@ -99,6 +111,13 @@ class VoronoiCenter:
 			list_corners.append(corner)
 		return list_corners
 		
+	func corner(idx):
+		var triangle = to_point().triangles_around()[idx]
+		return VoronoiCorner.new(triangle)
+
+	func corner_count():
+		return to_point().triangles_around().size()
+
 	func polygon():
 		var polygon = []
 		for corner in corners():
@@ -223,7 +242,19 @@ class Triangle:
 		var data = _terrain._triangles_data[_idx]
 		if data.has(key):
 			return data[key]
-		
+
+	func has_temp_key(key):
+		return _terrain._triangles_temp_data[_idx].has(key)
+				
+	func set_temp_data(key,value):
+		var data = _terrain._triangles_temp_data[_idx]
+		data[key] = value
+				
+	func get_temp_data(key):
+		var data = _terrain._triangles_temp_data[_idx]
+		if data.has(key):
+			return data[key]
+
 	func edges():
 		return [Edge.new(3 * _idx, _terrain), Edge.new(3 * _idx + 1, _terrain), Edge.new(3 * _idx + 2, _terrain)]
 		
@@ -243,37 +274,48 @@ class Triangle:
 		return list_triangles
 
 	func center2d():
-		var points = points()
-		var a = points[0].point2d()
-		var b = points[1].point2d()
-		var c = points[2].point2d()
-		var ad = a[0] * a[0] + a[1] * a[1]
-		var bd = b[0] * b[0] + b[1] * b[1]
-		var cd = c[0] * c[0] + c[1] * c[1]
-		var D = 2 * (a[0] * (b[1] - c[1]) + b[0] * (c[1] - a[1]) + c[0] * (a[1] - b[1]))
+		var circumcenter = get_data("center2d")
+		if not circumcenter:
+			var points = points()
+			var a = points[0].point2d()
+			var b = points[1].point2d()
+			var c = points[2].point2d()
+			var ad = a[0] * a[0] + a[1] * a[1]
+			var bd = b[0] * b[0] + b[1] * b[1]
+			var cd = c[0] * c[0] + c[1] * c[1]
+			var D = 2 * (a[0] * (b[1] - c[1]) + b[0] * (c[1] - a[1]) + c[0] * (a[1] - b[1]))
+			
+			circumcenter = Vector2(
+				1 / D * (ad * (b[1] - c[1]) + bd * (c[1] - a[1]) + cd * (a[1] - b[1])),
+				1 / D * (ad * (c[0] - b[0]) + bd * (a[0] - c[0]) + cd * (b[0] - a[0]))
+			)
 
-		return Vector2(
-			1 / D * (ad * (b[1] - c[1]) + bd * (c[1] - a[1]) + cd * (a[1] - b[1])),
-			1 / D * (ad * (c[0] - b[0]) + bd * (a[0] - c[0]) + cd * (b[0] - a[0]))
-		)
+			set_data("center2d", circumcenter)
+			return circumcenter
+		return circumcenter
 		# return (points[0].point2d() + points[1].point2d() + points[2].point2d()) / 3.0
 		
 	func center3d():
-		var points = points()
-		var a = points[0].point2d()
-		var b = points[1].point2d()
-		var c = points[2].point2d()
-		var ad = a[0] * a[0] + a[1] * a[1]
-		var bd = b[0] * b[0] + b[1] * b[1]
-		var cd = c[0] * c[0] + c[1] * c[1]
-		var D = 2 * (a[0] * (b[1] - c[1]) + b[0] * (c[1] - a[1]) + c[0] * (a[1] - b[1]))
+		var circumcenter = get_data("center3d")
+		if not circumcenter:
+			var points = points()
+			var a = points[0].point2d()
+			var b = points[1].point2d()
+			var c = points[2].point2d()
+			var ad = a[0] * a[0] + a[1] * a[1]
+			var bd = b[0] * b[0] + b[1] * b[1]
+			var cd = c[0] * c[0] + c[1] * c[1]
+			var D = 2 * (a[0] * (b[1] - c[1]) + b[0] * (c[1] - a[1]) + c[0] * (a[1] - b[1]))
 
-		return Vector3(
-			1 / D * (ad * (b[1] - c[1]) + bd * (c[1] - a[1]) + cd * (a[1] - b[1])),
-			points[0].get_elevation(),
-			1 / D * (ad * (c[0] - b[0]) + bd * (a[0] - c[0]) + cd * (b[0] - a[0]))
-		)
+			circumcenter = Vector3(
+				1 / D * (ad * (b[1] - c[1]) + bd * (c[1] - a[1]) + cd * (a[1] - b[1])),
+				points[0].get_elevation(),
+				1 / D * (ad * (c[0] - b[0]) + bd * (a[0] - c[0]) + cd * (b[0] - a[0]))
+			)
 
+			set_data("center3d", circumcenter)
+			return circumcenter
+		return circumcenter
 		# var center2d = center2d()
 		# return Vector3(center2d.x, )
 		# var points = points()
@@ -359,6 +401,18 @@ class Point:
 		var data = _terrain._points_data[_idx]
 		if data.has(key):
 			return data[key]
+
+	func has_temp_key(key):
+		return _terrain._points_temp_data[_idx].has(key)
+						
+	func set_temp_data(key,value):
+		var data = _terrain._points_temp_data[_idx]
+		data[key] = value
+				
+	func get_temp_data(key):
+		var data = _terrain._points_temp_data[_idx]
+		if data.has(key):
+			return data[key]
 		
 	func point3d():
 		return _terrain._points[_idx]
@@ -401,10 +455,13 @@ class Point:
 		return list_points
 		
 	func triangles_around():
-		var list_triangles = []
-		for edge in edges_around():
-			list_triangles.append(edge.triangle())
-#			list_triangles.append(edge.opposite().triangle())
+		var list_triangles = get_temp_data("triangles_around")
+		if not list_triangles:
+			list_triangles = []
+			for edge in edges_around():
+				list_triangles.append(edge.triangle())
+	#			list_triangles.append(edge.opposite().triangle())
+			set_temp_data("triangles_around", list_triangles)
 		return list_triangles
 
 # Edges iterator
@@ -458,6 +515,17 @@ class Edge:
 		var data = _terrain._edges_data[_idx]
 		if data.has(key):
 			return data[key]
+
+	func has_temp_key(key):
+		return _terrain._edges_temp_data[_idx].has(key)
+				
+	func set_temp_data(key,value):
+		_terrain._edges_temp_data[_idx][key] = value
+		
+	func get_temp_data(key):
+		var data = _terrain._edges_temp_data[_idx]
+		if data.has(key):
+			return data[key]
 		
 	func next_half():
 		return Edge.new(_idx - 2 if _idx % 3 == 2 else _idx + 1, _terrain)
@@ -500,6 +568,10 @@ var _data = {}
 var _points_data = []
 var _edges_data = []
 var _triangles_data = []
+var _temp_data = {}
+var _points_temp_data = []
+var _edges_temp_data = []
+var _triangles_temp_data = []
 
 var _created = false
 var _loaded = false
@@ -563,12 +635,15 @@ func create(width:int, height:int, spacing:int, name:String):
 	_height = height
 	_spacing = spacing
 	_name = name
+	Global.loadings["world_creation"].new_phase("Generation des points...", 1)
 	_create_points()
 	delaunay = Delaunator.new(_points)
 	
 	_halfedges = PoolIntArray(delaunay.halfedges)
 	_triangles = PoolIntArray(delaunay.triangles)
 	
+	Global.loadings["world_creation"].new_phase("Initialisation du terrain...", get_points().size() + get_edges().size())
+
 	# Initialize find_point
 	_data["find_point"]=[]
 	_data["find_point"].resize(1024)
@@ -576,24 +651,29 @@ func create(width:int, height:int, spacing:int, name:String):
 		_data["find_point"][idx]=[]
 	for point in get_points():
 		_data["find_point"][point.find_index()].append(point.get_index())
+		Global.loadings["world_creation"].increment_step()
 	
 	# Initialize _points_to_halfedges
 	for edge in get_edges():
 		var endpoint = _triangles[edge.next_half().get_index()]
 		if (! _points_to_halfedges.has(endpoint) or _halfedges[edge.get_index()] == -1):
 			_points_to_halfedges[endpoint] = edge.get_index()
+		Global.loadings["world_creation"].increment_step()
 		
 	# Initialise _points_data
 	for point_idx in self.get_points().size():
 		_points_data.append({})
+		_points_temp_data.append({})
 	
 	# Initialise _edges_data
 	for edge_idx in self.get_edges().size():
 		_edges_data.append({})
+		_edges_temp_data.append({})
 	
 	# Initialise _triangle_data
 	for triangle_idx in self.get_triangles().size():
 		_triangles_data.append({})
+		_triangles_temp_data.append({})
 	
 	_created = true
 	save()
@@ -611,10 +691,36 @@ func _create_points():
 # Terrain methodes
 func set_data(key,value):
 	_data[key] = value
+
+func set_temp_data(key, value):
+	_temp_data[key] = value
 	
 func get_data(key):
 	if _data.has(key):
 		return _data[key]
+
+func get_temp_data(key):
+	if _temp_data.has(key):
+		return _temp_data[key]
+
+func reset_temp_data():
+	_temp_data = {}
+	
+	# Reset _points_data
+	_points_temp_data = []
+	for point_idx in self.get_points().size():
+		_points_temp_data.append({})
+		
+	# Reset _edges_data
+	_edges_temp_data = []
+	for edge_idx in self.get_edges().size():
+		_edges_temp_data.append({})
+	
+	# Reset _triangle_data
+	_triangles_temp_data = []
+	for triangle_idx in self.get_triangles().size():
+		_triangles_temp_data.append({})
+
 
 func get_triangles():
 	var triangles = Triangles.new(self)
@@ -693,14 +799,14 @@ func delete(name):
 		var filename = directory.get_next()
 		while filename != "":
 			if( directory.file_exists(filename)):
-				print("Found file: " + filename)
+				Global.print_debug("Found file: " + filename)
 				directory.remove(filename)
 			filename = directory.get_next()
 		directory.list_dir_end()
 		directory.change_dir("..")
 		var result = directory.remove(name)
 		if(result != OK):
-			print(result)
+			Global.print_debug(result)
 			
 
 func save_parameter():
@@ -758,6 +864,19 @@ func load(name):
 	# Load data
 	if directory.file_exists("data.save"):
 		load_data(name)
+
+	# Initialise _points_temp_data
+	for point_idx in self.get_points().size():
+		_points_temp_data.append({})
+	
+	# Initialise _edges_temp_data
+	for edge_idx in self.get_edges().size():
+		_edges_temp_data.append({})
+	
+	# Initialise _triangle_temp_data
+	for triangle_idx in self.get_triangles().size():
+		_triangles_temp_data.append({})
+	
 		
 	_loaded = true
 
