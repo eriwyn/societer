@@ -56,7 +56,7 @@ func init_data():
 
 	Global.loadings["world_creation"].new_phase("Remplissage des oceans...", 1)
 	fill_oceans()
-	# remove_holes()
+	remove_holes()
 
 	Global.loadings["world_creation"].new_phase("Generation des biomes...", Global.terrain.get_centers().size())
 	for center in Global.terrain.get_centers():
@@ -258,7 +258,7 @@ func fill_oceans():
 func remove_holes():
 	for center in Global.terrain.get_centers():
 		if center.get_data("water") and not center.get_data("ocean"):
-			center.set_elevation(0.2)
+			center.set_elevation(0.02)
 			center.set_data("water", false)
 
 func is_coast(point):
