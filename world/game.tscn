@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=2]
+[gd_scene load_steps=13 format=2]
 
 [ext_resource path="res://ui/ui.tscn" type="PackedScene" id=1]
 [ext_resource path="res://world/materials/world2.material" type="Material" id=2]
@@ -151,8 +151,6 @@ shader_param/noise2 = SubResource( 7 )
 [sub_resource type="QuadMesh" id=8]
 size = Vector2( 2, 2 )
 
-[sub_resource type="CubeMesh" id=9]
-
 [node name="Game" type="Node"]
 
 [node name="UI" parent="." instance=ExtResource( 1 )]
@@ -196,10 +194,6 @@ extra_cull_margin = 3653.19
 mesh = SubResource( 8 )
 skeleton = NodePath("../..")
 material/0 = ExtResource( 2 )
-
-[node name="MeshInstance" type="MeshInstance" parent="World3d"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 2.0515, 0.388711, 13.3283 )
-mesh = SubResource( 9 )
 
 [connection signal="map_clicked" from="UI/Map" to="World3d/CamBase/Camera" method="_on_Map_map_clicked"]
 [connection signal="camera_moved" from="World3d/CamBase/Camera" to="UI/Map/Cursor" method="_on_Camera_camera_moved"]
