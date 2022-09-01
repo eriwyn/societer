@@ -1,4 +1,4 @@
-extends CameraOutline
+extends Camera
 class_name CameraController
 
 signal camera_moved(new_location)
