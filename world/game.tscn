@@ -1,7 +1,7 @@
-[gd_scene load_steps=13 format=2]
+[gd_scene load_steps=14 format=2]
 
 [ext_resource path="res://ui/ui.tscn" type="PackedScene" id=1]
-[ext_resource path="res://world/materials/world2.material" type="Material" id=2]
+[ext_resource path="res://world/materials/outline.tres" type="Shader" id=2]
 [ext_resource path="res://world/World3d.gd" type="Script" id=4]
 [ext_resource path="res://utils/camera/CamBase.tscn" type="PackedScene" id=5]
 
@@ -151,6 +151,14 @@ shader_param/noise2 = SubResource( 7 )
 [sub_resource type="QuadMesh" id=8]
 size = Vector2( 2, 2 )
 
+[sub_resource type="ShaderMaterial" id=9]
+shader = ExtResource( 2 )
+shader_param/outline_mode = 3
+shader_param/outline_intensity = 0.1
+shader_param/_round = true
+shader_param/outline_bias = 0.0
+shader_param/outline_color = Color( 0, 0, 0, 1 )
+
 [node name="Game" type="Node"]
 
 [node name="UI" parent="." instance=ExtResource( 1 )]
@@ -186,14 +194,11 @@ transform = Transform( 0.971628, 0.168947, -0.16552, 0, 0.699825, 0.714314, 0.23
 light_energy = 0.1
 shadow_enabled = true
 
-[node name="Spatial" type="Spatial" parent="World3d"]
-
-[node name="MeshInstance" type="MeshInstance" parent="World3d/Spatial"]
+[node name="Outline" type="MeshInstance" parent="World3d"]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 6.29265, 7.41201, 29.3021 )
 extra_cull_margin = 3653.19
 mesh = SubResource( 8 )
-skeleton = NodePath("../..")
-material/0 = ExtResource( 2 )
+material/0 = SubResource( 9 )
 
 [connection signal="map_clicked" from="UI/Map" to="World3d/CamBase/Camera" method="_on_Map_map_clicked"]
 [connection signal="camera_moved" from="World3d/CamBase/Camera" to="UI/Map/Cursor" method="_on_Camera_camera_moved"]
