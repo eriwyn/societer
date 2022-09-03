@@ -1,7 +1,8 @@
-[gd_scene load_steps=14 format=2]
+[gd_scene load_steps=15 format=2]
 
 [ext_resource path="res://ui/ui.tscn" type="PackedScene" id=1]
 [ext_resource path="res://world/materials/outline.tres" type="Shader" id=2]
+[ext_resource path="res://world/default_env.tres" type="Environment" id=3]
 [ext_resource path="res://world/World3d.gd" type="Script" id=4]
 [ext_resource path="res://utils/camera/CamBase.tscn" type="PackedScene" id=5]
 
@@ -179,6 +180,7 @@ mesh = SubResource( 1 )
 material/0 = SubResource( 3 )
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="World3d"]
+environment = ExtResource( 3 )
 
 [node name="CamBase" parent="World3d" instance=ExtResource( 5 )]
 
@@ -191,7 +193,7 @@ height = 5.0
 
 [node name="DirectionalLight" type="DirectionalLight" parent="World3d"]
 transform = Transform( 0.971628, 0.168947, -0.16552, 0, 0.699825, 0.714314, 0.236516, -0.694047, 0.67997, 0, 1.41623, 14.8745 )
-light_energy = 0.1
+light_energy = 0.2
 shadow_enabled = true
 
 [node name="Outline" type="MeshInstance" parent="World3d"]

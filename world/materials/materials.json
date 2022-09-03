@@ -1,5 +1,6 @@
 {
   "grass": 0,
   "stone": 1,
-  "sand": 2
+  "sand": 2,
+  "snow": 3
 }
