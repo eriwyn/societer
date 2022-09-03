@@ -47,6 +47,9 @@ func init_data():
 	Global.loadings["world_creation"].new_phase("Generation des continents...", Global.terrain.get_centers().size())
 	for center in Global.terrain.get_centers():
 		center.set_elevation(find_elevation(center.point2d()))
+		center.set_data("temperature", find_temperature(center))
+		if center.get_data("temperature") > 0.5:
+			center.set_data("snow", true)
 		if center.get_elevation() <= 0.0:
 			center.set_data("water", true)
 		if center.get_elevation() >= mountain_height:
@@ -238,6 +241,14 @@ func find_elevation(point):
 	elevation = (elevation * terraces) / terraces
 	return elevation
 
+func find_temperature(center):
+	
+	var poles = 4
+	var equator = -4
+	var elevation = center.get_elevation()
+	var latitude = sin(PI * (float(center.point2d().y) / float(Global.terrain.get_parameters()["height"])))
+	var temperature = 40*elevation*elevation + poles + (equator-poles) * latitude
+	return temperature
 
 func fill_oceans():
 	var stack = []

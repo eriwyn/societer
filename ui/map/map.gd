@@ -19,6 +19,8 @@ func heightmap():
 			if center.get_data("ocean"):
 				# var factor = pow((center.get_elevation()+1.001), 10) / 5.0
 				color = Color("#5e4fa2")
+			if center.get_data("snow"):
+				color = Color.white
 			# if center.get_data("coast"):
 				# color = Color.black
 			if center.polygon().size() > 2:

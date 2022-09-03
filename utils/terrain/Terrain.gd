@@ -975,3 +975,11 @@ func get_chunk(vect):
 		# print(idx)
 		centers.append(get_center(idx))
 	return centers
+
+func get_parameters():
+	return {
+		"name": _name,
+		"width": _width,
+		"height": _height,
+		"spacing": _spacing
+	}

@@ -19,6 +19,9 @@ func create_mesh():
 			var material_id = Global.materials[center.get_data("material")]
 			var top_uv = Vector2(0, float(material_id) / (Global.materials.size()-1))
 			var border_uv = Vector2(1, float(material_id) / (Global.materials.size()-1))
+			if center.get_data("snow"):
+				top_uv.y = float(Global.materials["snow"]) / (Global.materials.size()-1)
+
 			var corner_number =  center.corner_count()
 			for corner_count in corner_number:
 				var current_corner = center.corner(corner_count)
