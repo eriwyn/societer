@@ -48,6 +48,7 @@ func init_data():
 	for center in Global.terrain.get_centers():
 		center.set_elevation(find_elevation(center.point2d()))
 		center.set_data("temperature", find_temperature(center))
+		center.set_data("moisture", find_moisture(center.point2d()))
 		if center.get_data("temperature") > 0.5:
 			center.set_data("snow", true)
 		if center.get_elevation() <= 0.0:
@@ -72,6 +73,13 @@ func init_data():
 			center.set_data("material", "stone")
 		if center.get_data("coast"):
 			center.set_data("material", "sand")
+		if (
+			not center.get_data("coast") 
+			and not center.get_data("mountain")
+			and not center.get_data("ocean")
+			and center.get_data("moisture") > 0.3
+		):
+			center.set_data("forest", true)
 		Global.loadings["world_creation"].increment_step()
 
 
@@ -239,6 +247,10 @@ func find_elevation(point):
 	elevation = min(elevation, 1)
 		
 	elevation = (elevation * terraces) / terraces
+	return elevation
+
+func find_moisture(point):
+	var elevation = noise.get_noise_2d((point.x + 100) / wavelength * 2, (point.y + 100) / wavelength * 2)
 	return elevation
 
 func find_temperature(center):

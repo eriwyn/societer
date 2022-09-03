@@ -15,12 +15,15 @@ func heightmap():
 			colors.add_point(0.0,  Color("#89cfa5")) # green
 			colors.add_point(-0.999,  Color("#5e4fa2")) # blue
 			var color = colors.interpolate(min(center.get_elevation() + 0.001, 0.999))
+			var moisture = center.get_data("moisture")
+			if moisture:
+				color = colors.interpolate(max(min(moisture + 0.001, 0.999), 0.001))
 			# color = Color.green
 			if center.get_data("ocean"):
 				# var factor = pow((center.get_elevation()+1.001), 10) / 5.0
 				color = Color("#5e4fa2")
-			if center.get_data("snow"):
-				color = Color.white
+#			if center.get_data("snow"):
+#				color = Color.white
 			# if center.get_data("coast"):
 				# color = Color.black
 			if center.polygon().size() > 2:
