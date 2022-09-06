@@ -272,7 +272,7 @@ func fill_oceans():
 
 	stack.append(first_center.get_index())
 	while stack.size():
-		var current_point_id = stack.pop_front()
+		var current_point_id = stack.pop_back()
 		Global.terrain.get_point(current_point_id).set_data("ocean", true)
 		for neighbour in Global.terrain.get_point(current_point_id).points_around():
 			if neighbour.get_data("water") and not neighbour.get_data("ocean"):

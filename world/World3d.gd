@@ -10,7 +10,7 @@ var thread
 func _ready():
 	# add_world()
 	thread = Thread.new()
-	add_trees()
+	# add_trees()
 
 func add_world():
 	var terrain_mesh = TerrainMesh.new()
