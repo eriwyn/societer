@@ -116,13 +116,17 @@ func update_chunks():
 		for neighbour in neighbours:
 			if(
 				neighbour.x >= c_x - chunk_amount * 0.5
-				and neighbour.x <= c_x + chunk_amount * 0.5
+				and neighbour.x <= c_x + chunk_amount * 0.53
 				and neighbour.y >= c_z - chunk_amount * 0.5
 				and neighbour.y <= c_z + chunk_amount * 0.53
 				and not neighbour in used
 			):
 				stack.append(neighbour)
 
+
+
+
+	
 func clean_up_chunks():
 	for key in chunks:
 		var chunk = chunks[key]
