@@ -3,6 +3,7 @@ extends MultiMeshInstance
 var extents = Vector2(10, 10)
 
 func _ready():
+	return
 	var poisson_disc_sampling: PoissonDiscSampling = PoissonDiscSampling.new()
 	var rng := RandomNumberGenerator.new()
 	rng.randomize()

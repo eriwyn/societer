@@ -12,8 +12,44 @@ func _init(x, z):
 	self.z = z
 
 func _ready():
-	generate_chunk()
+	# generate_chunk()
+	generate_grass()
 	pass
+
+func generate_grass():
+	var poisson_disc_sampling: PoissonDiscSampling = PoissonDiscSampling.new()
+	var rng := RandomNumberGenerator.new()
+	rng.randomize()
+	var coords = []
+	for center in Global.terrain.get_chunk(Vector2(x, z)):
+		if (
+			not center.get_data("mountain")
+			and not center.get_data("water")
+			and not center.get_data("coast")
+		):
+			var points = poisson_disc_sampling.generate_points(0.1, center.polygon(), 2)
+			var points3d = []
+			for point in points:
+				points3d.append(Vector3(point.x, center.get_elevation() * 120, point.y))
+			coords += points3d
+	# var multimesh = MultiMesh.new()
+	var multimesh = MultiMesh.new()
+	multimesh.mesh = load("res://world/grass.obj")
+	multimesh.mesh.surface_set_material(0, load("res://world/materials/wind_grass.tres"))
+	multimesh.transform_format = MultiMesh.TRANSFORM_3D
+	multimesh.instance_count = coords.size()
+	for instance_index in multimesh.instance_count:
+
+		var transform := Transform().rotated(Vector3.UP, rng.randf_range(-PI / 2, PI / 2))
+		transform.origin = Vector3(coords[instance_index].x, coords[instance_index].y, coords[instance_index].z)
+#		transform.scaled(Vector3())
+		
+		multimesh.set_instance_transform(instance_index, transform)
+	var multimesh_instance = MultiMeshInstance.new()
+	multimesh_instance.multimesh = multimesh
+	add_child(multimesh_instance)
+	pass
+
 func generate_chunk():
 	var file = File.new()
 	file.open("res://world/materials/materials.json", File.READ)

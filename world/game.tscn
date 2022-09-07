@@ -220,6 +220,11 @@ material_override = ExtResource( 6 )
 multimesh = SubResource( 11 )
 script = ExtResource( 8 )
 
+[node name="grass" type="MeshInstance" parent="World3d/MultiMeshInstance"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 16.969, 18.8547, 49.3429 )
+mesh = ExtResource( 7 )
+material/0 = ExtResource( 6 )
+
 [connection signal="map_clicked" from="UI/Map" to="World3d/CamBase/Camera" method="_on_Map_map_clicked"]
 [connection signal="camera_moved" from="World3d/CamBase/Camera" to="UI/Map/Cursor" method="_on_Camera_camera_moved"]
 

@@ -2,15 +2,15 @@ extends Spatial
 
 var rng = RandomNumberGenerator.new()
 var chunk_size = 32
-var chunk_amount = 16
+var chunk_amount = 1
 var chunks = {}
 var unready_chunks = {}
 var thread
 
 func _ready():
-	# add_world()
+	add_world()
 	thread = Thread.new()
-	# add_trees()
+	add_trees()
 
 func add_world():
 	var terrain_mesh = TerrainMesh.new()
