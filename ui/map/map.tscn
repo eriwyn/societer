@@ -4,7 +4,11 @@
 [ext_resource path="res://ui/map/cursor/cursor.png" type="Texture" id=2]
 [ext_resource path="res://ui/map/cursor/Cursor.gd" type="Script" id=3]
 
-[node name="Map" type="Node2D"]
+[node name="Map" type="TextureRect"]
+anchor_right = 0.5
+anchor_bottom = 0.852
+margin_right = 3.0
+margin_bottom = 0.799988
 script = ExtResource( 1 )
 
 [node name="Cursor" type="Sprite" parent="."]

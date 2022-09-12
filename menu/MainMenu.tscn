@@ -47,10 +47,6 @@ margin_right = 316.0
 margin_bottom = 266.0
 text = "Quitter"
 
-[node name="Viewport" type="Viewport" parent="."]
-size = Vector2( 2048, 2048 )
-own_world = true
-
 [connection signal="pressed" from="VBoxContainer/NewButton" to="." method="_on_NewButton_pressed"]
 [connection signal="pressed" from="VBoxContainer/LoadButton" to="." method="_on_LoadButton_pressed"]
 [connection signal="pressed" from="VBoxContainer/QuitButton" to="." method="_on_QuitButton_pressed"]

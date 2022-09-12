@@ -50,7 +50,7 @@ func change_action(action):
 		CAMERA_ACTIONS.ROTATING_VIEW:
 			Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 
-func _process(delta):
+func _process(_delta):
 	
 	match(current_action):
 		CAMERA_ACTIONS.MOVING:
@@ -121,8 +121,8 @@ func rotate_view(axis : Vector2):
 	rotation.y = yaw
 
 func teleport(position):
-	global_transform.origin.x = position.x
-	global_transform.origin.z = position.y
+	global_transform.origin.x = position.x * 4.0
+	global_transform.origin.z = position.y * 4.0
 
 	var y_offset = 0
 	var space_state = get_world().direct_space_state
