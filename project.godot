@@ -30,6 +30,11 @@ _global_script_classes=[ {
 "path": "res://utils/loading/LoadingHelper.gd"
 }, {
 "base": "Reference",
+"class": "Map",
+"language": "GDScript",
+"path": "res://utils/map/map.gd"
+}, {
+"base": "Reference",
 "class": "PoissonDiscSampling",
 "language": "GDScript",
 "path": "res://addons/PoissonDiscSampling/PoissonDiscSampling.gd"
@@ -54,6 +59,7 @@ _global_script_class_icons={
 "CameraOutline": "",
 "Delaunator": "",
 "LoadingHelper": "",
+"Map": "",
 "PoissonDiscSampling": "",
 "Terrain": "",
 "TerrainMesh": "",
@@ -69,6 +75,10 @@ config/icon="res://icon.png"
 [autoload]
 
 Global="*res://utils/Global.gd"
+
+[display]
+
+window/dpi/allow_hidpi=true
 
 [editor_plugins]
 

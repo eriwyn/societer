@@ -26,7 +26,7 @@ func _init():
 		Global.loadings["world_creation"].start(coeffs, "Chargement...", 100)
 		Global.terrain.load(Global.terrain_name)
 	else:
-		var coeffs = [0, 1, 2, 2, 2, 2, 2, 8]
+		var coeffs = [0, 1, 2, 2, 2, 2, 2, 8, 8]
 		Global.loadings["world_creation"].start(coeffs, "Start", 100)
 		Global.terrain.create(width,height,spacing,Global.terrain_name)
 
@@ -36,6 +36,7 @@ func _init():
 		Global.terrain.save()
 		var terrain_mesh = TerrainMesh.new()
 		Global.terrain.set_temp_data("mesh", terrain_mesh.create_mesh())
+		Global.map.gen_map()
 
 	if Global.terrain.is_loaded():
 		var terrain_mesh = TerrainMesh.new()
@@ -73,6 +74,7 @@ func init_data():
 			center.set_data("material", "stone")
 		if center.get_data("coast"):
 			center.set_data("material", "sand")
+		
 		if (
 			not center.get_data("coast") 
 			and not center.get_data("mountain")
@@ -80,6 +82,13 @@ func init_data():
 			and center.get_data("moisture") > 0.3
 		):
 			center.set_data("forest", true)
+      
+		if not center.get_data("water"):
+			var voronoi = center.polygon()
+			center.set_data("voronoi",voronoi)
+			var voronoi_bounding_box = Global.polygon_bounding_box(voronoi)
+			center.set_data("voronoi_bounding_box",voronoi_bounding_box)
+      
 		Global.loadings["world_creation"].increment_step()
 
 

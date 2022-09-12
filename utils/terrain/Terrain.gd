@@ -106,7 +106,8 @@ class VoronoiCenter:
 	func corners():
 		var list_corners = []
 		
-		for triangle in to_point().triangles_around():
+		var a_point = to_point()
+		for triangle in a_point.triangles_around():
 			var corner = VoronoiCorner.new(triangle)
 			list_corners.append(corner)
 		return list_corners
@@ -291,7 +292,6 @@ class Triangle:
 			)
 
 			set_data("center2d", circumcenter)
-			return circumcenter
 		return circumcenter
 		# return (points[0].point2d() + points[1].point2d() + points[2].point2d()) / 3.0
 		
@@ -314,7 +314,6 @@ class Triangle:
 			)
 
 			set_data("center3d", circumcenter)
-			return circumcenter
 		return circumcenter
 		# var center2d = center2d()
 		# return Vector3(center2d.x, )
@@ -430,15 +429,16 @@ class Point:
 		
 	func edges_around():
 		var list_edges = []
-		var incoming = _terrain._points_to_halfedges.get(_idx)
-		var incoming_edge = Edge.new(incoming, _terrain)
-		var outgoing_edge
-		while true:
-			list_edges.append(incoming_edge);
-			outgoing_edge = incoming_edge.next_half()
-			incoming_edge = Edge.new(_terrain._halfedges[outgoing_edge._idx], _terrain);
-			if not (incoming_edge._idx != -1 and incoming_edge._idx != incoming):
-				break
+		if _terrain._points_to_halfedges.has(_idx):
+			var incoming = _terrain._points_to_halfedges.get(_idx)
+			var incoming_edge = Edge.new(incoming, _terrain)
+			var outgoing_edge
+			while true:
+				list_edges.append(incoming_edge);
+				outgoing_edge = incoming_edge.next_half()
+				incoming_edge = Edge.new(_terrain._halfedges[outgoing_edge._idx], _terrain);
+				if not (incoming_edge._idx != -1 and incoming_edge._idx != incoming):
+					break
 		return list_edges
 		
 	func points_around():
@@ -579,7 +579,7 @@ var _path = ""
 var _list = []
 
 # Terrain constructor
-func _init(width:int=1600, height:int=800, spacing:int=30, create=false, name:String=""):
+func _init():
 	var directory = Directory.new()
 	var file = File.new()
 	var file_name = ""
@@ -616,18 +616,6 @@ func _init(width:int=1600, height:int=800, spacing:int=30, create=false, name:St
 		directory_name = directory.get_next()
 	directory.list_dir_end()
 	
-	# Create or Load Terrain
-	_path = "user://terrain/%s" % (name)
-	parameter_file_name = "%s/param.save" % (_path)
-	graph_file_name = "%s/graph.save" % (_path)
-	data_file_name = "%s/data.save" % (_path)
-	if directory.open(_path) == OK and file.file_exists(parameter_file_name) and file.file_exists(graph_file_name) and file.file_exists(data_file_name) and not create:
-		Global.print_debug("loading : %s ..." % (name))
-		load(name)
-	else:
-		if name:
-			create(width, height, spacing, name)
-		
 func create(width:int, height:int, spacing:int, name:String):
 	Global.print_debug("Creating : %s ..." % (name))
 	var delaunay: Delaunator
@@ -643,15 +631,6 @@ func create(width:int, height:int, spacing:int, name:String):
 	_triangles = PoolIntArray(delaunay.triangles)
 	
 	Global.loadings["world_creation"].new_phase("Initialisation du terrain...", get_points().size() + get_edges().size())
-
-	# Initialize find_point
-	_data["find_point"]=[]
-	_data["find_point"].resize(1024)
-	for idx in 1024:
-		_data["find_point"][idx]=[]
-	for point in get_points():
-		_data["find_point"][point.find_index()].append(point.get_index())
-		Global.loadings["world_creation"].increment_step()
 	
 	# Initialize _points_to_halfedges
 	for edge in get_edges():
@@ -660,6 +639,7 @@ func create(width:int, height:int, spacing:int, name:String):
 			_points_to_halfedges[endpoint] = edge.get_index()
 		Global.loadings["world_creation"].increment_step()
 		
+	_create_find_point_table()
 	# Initialise _points_data
 	for point_idx in self.get_points().size():
 		_points_data.append({})
@@ -677,6 +657,22 @@ func create(width:int, height:int, spacing:int, name:String):
 	
 	_created = true
 	save()
+	
+# Create a table to find a point from vector2
+func _create_find_point_table():
+	var find_point = []
+#	var corners = {}
+#	var edges = {}
+	find_point.resize(1024)
+	for idx in 1024:
+		find_point[idx]=[]
+	for point in get_points():
+		var point_index = point.get_index()
+		find_point[point.find_index()].append(point_index)
+		
+		var center = point.to_center()
+	
+	set_data("find_point",find_point)
 
 # Create points on the terrain	
 func _create_points():
@@ -698,6 +694,9 @@ func set_temp_data(key, value):
 func get_data(key):
 	if _data.has(key):
 		return _data[key]
+		
+func get_name():
+	return _name
 
 func get_temp_data(key):
 	if _temp_data.has(key):
